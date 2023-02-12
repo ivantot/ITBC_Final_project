@@ -4,7 +4,6 @@ from sqlalchemy import Column, String, ForeignKey
 from sqlalchemy.orm import relationship
 
 from app.db import Base
-from app.users.enums import RoleEnum
 
 
 class UserHasRole(Base):
@@ -13,8 +12,9 @@ class UserHasRole(Base):
     user_id = Column(String(50), ForeignKey("users.user_id"))
     role_id = Column(String(50), ForeignKey("roles.role_id"))
 
-    user = relationship("Users", lazy="subquery")
-    role = relationship("Roles", lazy="subquery")
+    user = relationship("User", lazy="subquery")
+    role = relationship("Role", lazy="subquery")
 
-    def __init__(self, role_type: RoleEnum):
-        self.role_type = role_type
+    def __init__(self, user_id: str, role_id: str):
+        self.user_id = user_id
+        self.role_id = role_id
