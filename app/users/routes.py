@@ -4,10 +4,10 @@ from app.users.controllers import UserController, RoleController, UserHasRoleCon
 from app.users.controllers.user_auth_controller import JWTBearer
 from app.users.schemas import RoleSchemaIn, RoleSchema, UserSchema, UserSchemaIn, UserHasRoleSchema, UserHasRoleSchemaIn
 
-admin_router = APIRouter(tags=["admin - run once to add initial admin and roles"], prefix="/api/admin")
-user_router = APIRouter(tags=["users"], prefix="/api/users")
-role_router = APIRouter(tags=["roles"], prefix="/api/roles")
-user_has_role_router = APIRouter(tags=["user_has_roles"], prefix="/api/user-has-roles")
+admin_router = APIRouter(tags=["Admin - run once to add initial admin and roles"], prefix="/api/admin")
+user_router = APIRouter(tags=["Users"], prefix="/api/users")
+role_router = APIRouter(tags=["Roles"], prefix="/api/roles")
+user_has_role_router = APIRouter(tags=["User has roles"], prefix="/api/user-has-roles")
 
 
 @admin_router.post("/setup-admin", response_model=UserSchema)
@@ -49,7 +49,7 @@ def get_all_admins():
 
 
 @user_router.put("/update/is_active", response_model=UserSchema)
-def update_user(user_id: str, is_active: bool):
+def update_user_is_active(user_id: str, is_active: bool):
     return UserController.update_user_is_active(user_id, is_active)
 
 

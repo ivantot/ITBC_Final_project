@@ -23,7 +23,7 @@ class UserController:
         if user:
             return user
         else:
-            raise HTTPException(status_code=400, detail=f"user with provided id {user_id} does not exist")
+            raise HTTPException(status_code=400, detail=f"User with provided id {user_id} does not exist.")
 
     @staticmethod
     def read_all_users():
@@ -38,7 +38,7 @@ class UserController:
     @staticmethod
     def update_user_is_active(user_id: str, is_active: bool):
         try:
-            UserServices.update_user_is_active(user_id, is_active)
+            return UserServices.update_user_is_active(user_id, is_active)
         except Exception as e:
             raise HTTPException(status_code=500, detail=str(e))
 
