@@ -9,8 +9,8 @@ from app.db import Base
 class UserHasRole(Base):
     __tablename__ = "user_has_roles"
     user_has_role_id = Column(String(50), primary_key=True, default=uuid4, autoincrement=False)
-    user_id = Column(String(50), ForeignKey("users.user_id"))
-    role_id = Column(String(50), ForeignKey("roles.role_id"))
+    user_id = Column(String(50), ForeignKey("users.user_id"), nullable=False)
+    role_id = Column(String(50), ForeignKey("roles.role_id"), nullable=False)
 
     user = relationship("User", lazy="subquery")
     role = relationship("Role", lazy="subquery")

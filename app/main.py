@@ -2,8 +2,9 @@ import uvicorn
 from fastapi import FastAPI
 from starlette.responses import RedirectResponse
 
+from app.categories import category_router
 from app.db import Base, engine
-from app.users.routes import user_router, role_router, admin_router, user_has_role_router
+from app.users import user_router, role_router, admin_router, user_has_role_router
 
 Base.metadata.create_all(bind=engine)
 
@@ -14,6 +15,7 @@ def init_app():
     application.include_router(user_router)
     application.include_router(role_router)
     application.include_router(user_has_role_router)
+    application.include_router(category_router)
 
     return application
 
