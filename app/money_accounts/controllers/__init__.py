@@ -1,0 +1,1 @@
+from .money_account_controllers import MoneyAccountController

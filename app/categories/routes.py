@@ -34,10 +34,10 @@ def update_category_is_active(category_id: str, is_active: bool):
 
 
 @category_router.put("/update", response_model=CategorySchema)
-def update_category_by_id(category_id, name, description):
+def update_category_by_id(category_id: str, category: CategorySchemaUpdate = None):
     return CategoryController.update_category_by_id(category_id,
-                                                    name,
-                                                    description)
+                                                    category.name,
+                                                    category.description)
 
 
 @category_router.delete("/", dependencies=[Depends(JWTBearer("ADMIN"))])
