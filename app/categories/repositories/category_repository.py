@@ -43,15 +43,6 @@ class CategoryRepository:
         except Exception as e:
             raise e
 
-    def delete_category_by_id(self, category_id: str) -> bool:
-        try:
-            category = self.db.query(Category).filter(Category.category_id == category_id).first()
-            self.db.delete(category)
-            self.db.commit()
-            return True
-        except Exception as e:
-            raise e
-
     def update_category_by_id(self, category_id: str, name: str = None, description: str = None) -> Category:
         try:
             category = self.db.query(Category).filter(Category.category_id == category_id).first()
@@ -65,5 +56,14 @@ class CategoryRepository:
             self.db.commit()
             self.db.refresh(category)
             return category
+        except Exception as e:
+            raise e
+
+    def delete_category_by_id(self, category_id: str) -> bool:
+        try:
+            category = self.db.query(Category).filter(Category.category_id == category_id).first()
+            self.db.delete(category)
+            self.db.commit()
+            return True
         except Exception as e:
             raise e
