@@ -1,7 +1,7 @@
 from fastapi import HTTPException
 from sqlalchemy.exc import IntegrityError
 
-from app.users.services import RoleServices
+from app.users.services import RoleService
 
 
 class RoleController:
@@ -9,7 +9,7 @@ class RoleController:
     @staticmethod
     def create_role(role_type: str):
         try:
-            role = RoleServices.create_role(role_type)
+            role = RoleService.create_role(role_type)
             return role
         except IntegrityError:
             raise HTTPException(status_code=400, detail=f"Role of this type {role_type} already exists.")
@@ -18,7 +18,7 @@ class RoleController:
 
     @staticmethod
     def read_role_by_id(role_id: str):
-        role = RoleServices.read_role_by_id(role_id)
+        role = RoleService.read_role_by_id(role_id)
         if role:
             return role
         else:
@@ -26,7 +26,7 @@ class RoleController:
 
     @staticmethod
     def read_role_by_type(role_type: str):
-        role = RoleServices.read_role_by_type(role_type)
+        role = RoleService.read_role_by_type(role_type)
         if role:
             return role
         else:
@@ -34,13 +34,13 @@ class RoleController:
 
     @staticmethod
     def read_all_roles():
-        roles = RoleServices.read_all_roles()
+        roles = RoleService.read_all_roles()
         return roles
 
     @staticmethod
     def delete_role_by_id(role_id: str):
         try:
-            RoleServices.delete_role_by_id(role_id)
+            RoleService.delete_role_by_id(role_id)
             return {"message": f"Role with provided id, {role_id} has been deleted."}
         except Exception as e:
             raise HTTPException(status_code=400, detail=str(e))

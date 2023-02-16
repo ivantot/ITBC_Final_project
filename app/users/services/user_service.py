@@ -5,7 +5,7 @@ from app.users.exceptions import UserInvalidPassword
 from app.users.reporistories import UserRepository, UserHasRoleRepository, RoleRepository
 
 
-class UserServices:
+class UserService:
 
     @staticmethod
     def create_user(email, password):
