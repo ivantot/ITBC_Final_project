@@ -1,1 +1,1 @@
-from .category_service import CategoryServices
+from .category_service import CategoryService

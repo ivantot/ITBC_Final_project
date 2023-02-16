@@ -6,7 +6,9 @@ from app.budgets import budget_router
 from app.categories import category_router
 from app.db import Base, engine
 from app.money_accounts import money_account_router
+from app.transactions import transaction_router
 from app.users import user_router, role_router, admin_router, user_has_role_router
+from app.vendors import vendor_router
 
 Base.metadata.create_all(bind=engine)
 
@@ -20,6 +22,8 @@ def init_app():
     application.include_router(category_router)
     application.include_router(money_account_router)
     application.include_router(budget_router)
+    application.include_router(vendor_router)
+    application.include_router(transaction_router)
 
     return application
 

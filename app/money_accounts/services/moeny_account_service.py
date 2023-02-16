@@ -2,7 +2,7 @@ from app.db import SessionLocal
 from app.money_accounts.repositiories import MoneyAccountRepository
 
 
-class MoneyAccountServices:
+class MoneyAccountService:
 
     @staticmethod
     def create_money_account(name: str, user_id: str, currency: str = "DIN",

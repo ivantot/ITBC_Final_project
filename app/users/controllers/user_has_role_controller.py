@@ -2,7 +2,7 @@
 from fastapi import HTTPException
 from sqlalchemy.exc import IntegrityError
 
-from app.users.services import UserHasRoleServices
+from app.users.services import UserHasRoleService
 
 
 class UserHasRoleController:
@@ -10,7 +10,7 @@ class UserHasRoleController:
     @staticmethod
     def create_user_has_role(user_id: str, role_id: str):
         try:
-            user_has_role = UserHasRoleServices.create_user_has_role(user_id, role_id)
+            user_has_role = UserHasRoleService.create_user_has_role(user_id, role_id)
             return user_has_role
         except IntegrityError:
             raise HTTPException(status_code=400, detail=f"Combination of user and provided role already exists.")
@@ -19,7 +19,7 @@ class UserHasRoleController:
 
     @staticmethod
     def read_user_has_role_by_id(user_has_role_id: str):
-        user_has_role = UserHasRoleServices.read_user_has_role_by_id(user_has_role_id)
+        user_has_role = UserHasRoleService.read_user_has_role_by_id(user_has_role_id)
         if user_has_role:
             return user_has_role
         else:
@@ -27,13 +27,13 @@ class UserHasRoleController:
 
     @staticmethod
     def read_user_has_roles_by_user_id(user_id: str):
-        user_has_roles = UserHasRoleServices.read_user_has_roles_by_user_id(user_id)
+        user_has_roles = UserHasRoleService.read_user_has_roles_by_user_id(user_id)
         return user_has_roles
 
     @staticmethod
     def delete_user_has_role_by_id(user_has_role_id: str):
         try:
-            UserHasRoleServices.delete_user_has_role_by_id(user_has_role_id)
+            UserHasRoleService.delete_user_has_role_by_id(user_has_role_id)
             return {"message": f"Combination of user with provided role has been deleted."}
         except Exception as e:
             raise HTTPException(status_code=400, detail=str(e))

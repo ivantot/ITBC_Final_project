@@ -1,1 +1,1 @@
-from .money_account_controllers import MoneyAccountController
+from .money_account_controller import MoneyAccountController

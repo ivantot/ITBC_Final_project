@@ -1,1 +1,1 @@
-from .moeny_account_service import MoneyAccountServices
+from .moeny_account_service import MoneyAccountService

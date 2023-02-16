@@ -3,7 +3,7 @@ from app.db import SessionLocal
 from app.users.reporistories import RoleRepository
 
 
-class RoleServices:
+class RoleService:
 
     @staticmethod
     def create_role(role_type: str):

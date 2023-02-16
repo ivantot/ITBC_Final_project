@@ -2,7 +2,7 @@ from app.budgets.repositories import BudgetRepository
 from app.db import SessionLocal
 
 
-class BudgetServices:
+class BudgetService:
 
     @staticmethod
     def create_budget(name: str,

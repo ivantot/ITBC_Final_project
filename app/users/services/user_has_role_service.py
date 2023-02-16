@@ -2,7 +2,7 @@ from app.db import SessionLocal
 from app.users.reporistories import UserHasRoleRepository
 
 
-class UserHasRoleServices:
+class UserHasRoleService:
 
     @staticmethod
     def create_user_has_role(user_id: str, role_id: str):

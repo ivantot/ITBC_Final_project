@@ -3,7 +3,7 @@ from app.categories.repositories import CategoryRepository
 from app.db import SessionLocal
 
 
-class CategoryServices:
+class CategoryService:
 
     @staticmethod
     def create_category(name: str, description: str):

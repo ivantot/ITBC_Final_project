@@ -1,6 +1,6 @@
 from fastapi import HTTPException
 
-from app.budgets.services import BudgetServices
+from app.budgets.services import BudgetService
 
 
 class BudgetController:
@@ -14,20 +14,20 @@ class BudgetController:
                       currency: str = "DIN",
                       balance: float = 0.0):
         try:
-            budget = BudgetServices.create_budget(name,
-                                                  user_id,
-                                                  category_id,
-                                                  start_date,
-                                                  end_date,
-                                                  currency,
-                                                  balance)
+            budget = BudgetService.create_budget(name,
+                                                 user_id,
+                                                 category_id,
+                                                 start_date,
+                                                 end_date,
+                                                 currency,
+                                                 balance)
             return budget
         except Exception as e:
             raise HTTPException(status_code=500, detail=str(e))
 
     @staticmethod
     def read_budget_by_id(budget_id: str):
-        budget = BudgetServices.read_budget_by_id(budget_id)
+        budget = BudgetService.read_budget_by_id(budget_id)
         if budget:
             return budget
         else:
@@ -35,7 +35,7 @@ class BudgetController:
 
     @staticmethod
     def read_budgets_by_user_id(user_id: str):
-        budgets = BudgetServices.read_budgets_by_user_id(user_id)
+        budgets = BudgetService.read_budgets_by_user_id(user_id)
         if budgets:
             return budgets
         else:
@@ -43,7 +43,7 @@ class BudgetController:
 
     @staticmethod
     def read_budgets_by_category_id(category_id: str):
-        budgets = BudgetServices.read_budgets_by_category_id(category_id)
+        budgets = BudgetService.read_budgets_by_category_id(category_id)
         if budgets:
             return budgets
         else:
@@ -52,7 +52,7 @@ class BudgetController:
 
     @staticmethod
     def read_budgets_by_currency(currency: str):
-        budgets = BudgetServices.read_budgets_by_currency(currency)
+        budgets = BudgetService.read_budgets_by_currency(currency)
         if budgets:
             return budgets
         else:
@@ -61,13 +61,13 @@ class BudgetController:
 
     @staticmethod
     def read_all_budgets():
-        budgets = BudgetServices.read_all_budgets()
+        budgets = BudgetService.read_all_budgets()
         return budgets
 
     @staticmethod
     def update_budget_is_active(budget_id: str, is_active: bool):
         try:
-            return BudgetServices.update_budget_is_active(budget_id, is_active)
+            return BudgetService.update_budget_is_active(budget_id, is_active)
         except Exception as e:
             raise HTTPException(status_code=500, detail=str(e))
 
@@ -81,21 +81,21 @@ class BudgetController:
                             currency: str = None,
                             balance: float = None):
         try:
-            return BudgetServices.update_budget_by_id(budget_id,
-                                                      name,
-                                                      user_id,
-                                                      category_id,
-                                                      start_date,
-                                                      end_date,
-                                                      currency,
-                                                      balance)
+            return BudgetService.update_budget_by_id(budget_id,
+                                                     name,
+                                                     user_id,
+                                                     category_id,
+                                                     start_date,
+                                                     end_date,
+                                                     currency,
+                                                     balance)
         except Exception as e:
             raise HTTPException(status_code=500, detail=str(e))
 
     @staticmethod
     def delete_budget_by_id(budget_id: str):
         try:
-            BudgetServices.delete_budget_by_id(budget_id)
+            BudgetService.delete_budget_by_id(budget_id)
             return {"message": f"Budget with provided id, {budget_id} has been deleted."}
         except Exception as e:
             raise HTTPException(status_code=400, detail=str(e))

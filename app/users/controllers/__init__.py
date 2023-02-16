@@ -1,3 +1,3 @@
-from .user_controllers import UserController
-from .role_controllers import RoleController
-from .user_has_role_controllers import UserHasRoleController
+from .user_controller import UserController
+from .role_controller import RoleController
+from .user_has_role_controller import UserHasRoleController
