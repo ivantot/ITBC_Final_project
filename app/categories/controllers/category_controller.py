@@ -1,6 +1,7 @@
 from fastapi import HTTPException
 from sqlalchemy.exc import IntegrityError
 
+from app.categories.exceprtions import CategoryNotFoundException
 from app.categories.services import CategoryService
 
 
@@ -41,6 +42,8 @@ class CategoryController:
     def update_category_is_active(category_id: str, is_active: bool):
         try:
             return CategoryService.update_category_is_active(category_id, is_active)
+        except CategoryNotFoundException as e:
+            raise HTTPException(status_code=e.code, detail=e.message)
         except Exception as e:
             raise HTTPException(status_code=500, detail=str(e))
 
@@ -48,6 +51,8 @@ class CategoryController:
     def update_category_by_id(category_id: str, name: str = None, description: str = None):
         try:
             return CategoryService.update_category_by_id(category_id, name, description)
+        except CategoryNotFoundException as e:
+            raise HTTPException(status_code=e.code, detail=e.message)
         except Exception as e:
             raise HTTPException(status_code=500, detail=str(e))
 
@@ -56,5 +61,7 @@ class CategoryController:
         try:
             CategoryService.delete_category_by_id(category_id)
             return {"message": f"Category with provided id, {category_id} has been deleted."}
+        except CategoryNotFoundException as e:
+            raise HTTPException(status_code=e.code, detail=e.message)
         except Exception as e:
             raise HTTPException(status_code=400, detail=str(e))

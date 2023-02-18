@@ -1,6 +1,11 @@
 from fastapi import HTTPException
 
+from app.budgets.exceptions import BudgetNotFoundException, BudgetNotActiveException
+from app.money_accounts.exceptions import MoneyAccountNotFoundException, MoneyAccountNotActiveException
+from app.transactions.exceptions import TransactionNotFoundException
 from app.transactions.services import TransactionService
+from app.users.exceptions import UserNotActiveException, UserNotFoundException
+from app.vendors.exceptions import VendorNotActiveException, VendorNotFoundException
 
 
 class TransactionController:
@@ -10,14 +15,32 @@ class TransactionController:
                            user_id: str,
                            vendor_id: str,
                            outbound: bool = True,
-                           currency: str = "DIN"):
+                           currency: str = "DIN",
+                           cash_payment: bool = True):
         try:
             transaction = TransactionService.create_transaction(amount,
                                                                 user_id,
                                                                 vendor_id,
                                                                 outbound,
-                                                                currency)
+                                                                currency,
+                                                                cash_payment)
             return transaction
+        except UserNotFoundException as e:
+            raise HTTPException(status_code=e.code, detail=e.message)
+        except UserNotActiveException as e:
+            raise HTTPException(status_code=e.code, detail=e.message)
+        except VendorNotFoundException as e:
+            raise HTTPException(status_code=e.code, detail=e.message)
+        except VendorNotActiveException as e:
+            raise HTTPException(status_code=e.code, detail=e.message)
+        except BudgetNotFoundException as e:
+            raise HTTPException(status_code=e.code, detail=e.message)
+        except BudgetNotActiveException as e:
+            raise HTTPException(status_code=e.code, detail=e.message)
+        except MoneyAccountNotFoundException as e:
+            raise HTTPException(status_code=e.code, detail=e.message)
+        except MoneyAccountNotActiveException as e:
+            raise HTTPException(status_code=e.code, detail=e.message)
         except Exception as e:
             raise HTTPException(status_code=500, detail=str(e))
 
@@ -56,6 +79,8 @@ class TransactionController:
     def update_transaction_is_valid(transaction_id: str, is_valid: bool):
         try:
             return TransactionService.update_transaction_is_valid(transaction_id, is_valid)
+        except TransactionNotFoundException as e:
+            raise HTTPException(status_code=e.code, detail=e.message)
         except Exception as e:
             raise HTTPException(status_code=500, detail=str(e))
 
@@ -64,5 +89,7 @@ class TransactionController:
         try:
             TransactionService.delete_transaction_by_id(transaction_id)
             return {"message": f"Transaction with provided id, {transaction_id} has been deleted."}
+        except TransactionNotFoundException as e:
+            raise HTTPException(status_code=e.code, detail=e.message)
         except Exception as e:
             raise HTTPException(status_code=400, detail=str(e))

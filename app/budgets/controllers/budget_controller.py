@@ -1,6 +1,9 @@
 from fastapi import HTTPException
 
+from app.budgets.exceptions import BudgetNotFoundException
 from app.budgets.services import BudgetService
+from app.categories.exceprtions import CategoryNotActiveException, CategoryNotFoundException
+from app.users.exceptions import UserNotActiveException, UserNotFoundException
 
 
 class BudgetController:
@@ -22,6 +25,14 @@ class BudgetController:
                                                  currency,
                                                  balance)
             return budget
+        except UserNotFoundException as e:
+            raise HTTPException(status_code=e.code, detail=e.message)
+        except UserNotActiveException as e:
+            raise HTTPException(status_code=e.code, detail=e.message)
+        except CategoryNotFoundException as e:
+            raise HTTPException(status_code=e.code, detail=e.message)
+        except CategoryNotActiveException as e:
+            raise HTTPException(status_code=e.code, detail=e.message)
         except Exception as e:
             raise HTTPException(status_code=500, detail=str(e))
 
@@ -68,6 +79,8 @@ class BudgetController:
     def update_budget_is_active(budget_id: str, is_active: bool):
         try:
             return BudgetService.update_budget_is_active(budget_id, is_active)
+        except BudgetNotFoundException as e:
+            raise HTTPException(status_code=e.code, detail=e.message)
         except Exception as e:
             raise HTTPException(status_code=500, detail=str(e))
 
@@ -89,6 +102,8 @@ class BudgetController:
                                                      end_date,
                                                      currency,
                                                      balance)
+        except BudgetNotFoundException as e:
+            raise HTTPException(status_code=e.code, detail=e.message)
         except Exception as e:
             raise HTTPException(status_code=500, detail=str(e))
 
@@ -97,5 +112,7 @@ class BudgetController:
         try:
             BudgetService.delete_budget_by_id(budget_id)
             return {"message": f"Budget with provided id, {budget_id} has been deleted."}
+        except BudgetNotFoundException as e:
+            raise HTTPException(status_code=e.code, detail=e.message)
         except Exception as e:
             raise HTTPException(status_code=400, detail=str(e))

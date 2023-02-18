@@ -1,5 +1,6 @@
 
 from app.db import SessionLocal
+from app.users.exceptions.role_exceptions import RoleNotFoundException
 from app.users.reporistories import RoleRepository
 
 
@@ -37,6 +38,9 @@ class RoleService:
         try:
             with SessionLocal() as db:
                 role_repository = RoleRepository(db)
+                role = role_repository.read_role_by_id(role_id)
+                if not role:
+                    raise RoleNotFoundException(message="Role not found in the system.", code=404)
                 return role_repository.delete_role_by_id(role_id)
         except Exception as e:
             raise e

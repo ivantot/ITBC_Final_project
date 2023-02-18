@@ -1,6 +1,8 @@
 from typing import Optional
 from pydantic import BaseModel, UUID4
 
+from app.categories.schemas import CategorySchema
+
 
 class VendorSchema(BaseModel):
     vendor_id: UUID4
@@ -9,6 +11,7 @@ class VendorSchema(BaseModel):
     category_id: str
     cash_only: bool
     is_active: bool
+    category: CategorySchema
 
     class Config:
         orm_mode = True

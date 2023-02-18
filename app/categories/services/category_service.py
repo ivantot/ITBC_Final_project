@@ -1,4 +1,4 @@
-
+from app.categories.exceprtions import CategoryNotFoundException
 from app.categories.repositories import CategoryRepository
 from app.db import SessionLocal
 
@@ -37,6 +37,10 @@ class CategoryService:
         with SessionLocal() as db:
             try:
                 category_repository = CategoryRepository(db)
+                category = category_repository.read_category_by_id(category_id)
+                if not category:
+                    raise CategoryNotFoundException(message="Category not found in the system.",
+                                                    code=404)
                 return category_repository.update_category_is_active(category_id, is_active)
             except Exception as e:
                 raise e
@@ -46,6 +50,10 @@ class CategoryService:
         with SessionLocal() as db:
             try:
                 category_repository = CategoryRepository(db)
+                category = category_repository.read_category_by_id(category_id)
+                if not category:
+                    raise CategoryNotFoundException(message="Category not found in the system.",
+                                                    code=404)
                 return category_repository.update_category_by_id(category_id, name, description)
             except Exception as e:
                 raise e
@@ -55,6 +63,9 @@ class CategoryService:
         try:
             with SessionLocal() as db:
                 category_repository = CategoryRepository(db)
+                category = category_repository.read_category_by_id(category_id)
+                if not category:
+                    raise CategoryNotFoundException(message="Category not found in the system.", code=404)
                 return category_repository.delete_category_by_id(category_id)
         except Exception as e:
             raise e

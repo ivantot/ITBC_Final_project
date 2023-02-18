@@ -1,7 +1,7 @@
 from fastapi import HTTPException
 from sqlalchemy.exc import IntegrityError
 
-from app.users.exceptions import UserInvalidPassword
+from app.users.exceptions import UserInvalidPassword, UserNotFoundException, UserNotActiveException
 from app.users.services import UserService, UserHasRoleService, RoleService, signJWT
 
 
@@ -31,6 +31,11 @@ class UserController:
         return users
 
     @staticmethod
+    def read_all_active_users():
+        users = UserService.read_all_active_users()
+        return users
+
+    @staticmethod
     def read_all_admins():
         admins = UserService.read_all_admins()
         return admins
@@ -39,6 +44,8 @@ class UserController:
     def update_user_is_active(user_id: str, is_active: bool):
         try:
             return UserService.update_user_is_active(user_id, is_active)
+        except UserNotFoundException as e:
+            raise HTTPException(status_code=e.code, detail=e.message)
         except Exception as e:
             raise HTTPException(status_code=500, detail=str(e))
 
@@ -47,6 +54,8 @@ class UserController:
         try:
             UserService.delete_user_by_id(user_id)
             return {"message": f"User with provided id, {user_id} has been deleted."}
+        except UserNotFoundException as e:
+            raise HTTPException(status_code=e.code, detail=e.message)
         except Exception as e:
             raise HTTPException(status_code=400, detail=str(e))
 
@@ -63,6 +72,10 @@ class UserController:
             elif "PRO_USER" in roles:
                 return signJWT(user.user_id, "PRO_USER")
             return signJWT(user.user_id, "USER")
+        except UserNotFoundException as e:
+            raise HTTPException(status_code=e.code, detail=e.message)
+        except UserNotActiveException as e:
+            raise HTTPException(status_code=e.code, detail=e.message)
         except UserInvalidPassword as e:
             raise HTTPException(status_code=e.code, detail=e.message)
         except Exception as e:

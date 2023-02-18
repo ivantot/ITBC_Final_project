@@ -1,6 +1,8 @@
 from fastapi import HTTPException
 from sqlalchemy.exc import IntegrityError
 
+from app.categories.exceprtions import CategoryNotActiveException, CategoryNotFoundException
+from app.vendors.exceptions import VendorNotFoundException
 from app.vendors.services import VendorService
 
 
@@ -14,6 +16,10 @@ class VendorController:
         try:
             vendor = VendorService.create_vendor(name, address, category_id, cash_only)
             return vendor
+        except CategoryNotFoundException as e:
+            raise HTTPException(status_code=e.code, detail=e.message)
+        except CategoryNotActiveException as e:
+            raise HTTPException(status_code=e.code, detail=e.message)
         except IntegrityError:
             raise HTTPException(status_code=400, detail=f"Vendor with provided name - {name} already exists.")
         except Exception as e:
@@ -52,6 +58,8 @@ class VendorController:
     def update_vendor_is_active(vendor_id: str, is_active: bool):
         try:
             return VendorService.update_vendor_is_active(vendor_id, is_active)
+        except VendorNotFoundException as e:
+            raise HTTPException(status_code=e.code, detail=e.message)
         except Exception as e:
             raise HTTPException(status_code=500, detail=str(e))
 
@@ -59,6 +67,8 @@ class VendorController:
     def update_vendor_cash_only(vendor_id: str, cash_only: bool):
         try:
             return VendorService.update_vendor_cash_only(vendor_id, cash_only)
+        except VendorNotFoundException as e:
+            raise HTTPException(status_code=e.code, detail=e.message)
         except Exception as e:
             raise HTTPException(status_code=500, detail=str(e))
 
@@ -66,6 +76,8 @@ class VendorController:
     def update_vendor_by_id(vendor_id: str, name: str = None, address: str = None):
         try:
             return VendorService.update_vendor_by_id(vendor_id, name, address)
+        except VendorNotFoundException as e:
+            raise HTTPException(status_code=e.code, detail=e.message)
         except Exception as e:
             raise HTTPException(status_code=500, detail=str(e))
 
@@ -74,5 +86,7 @@ class VendorController:
         try:
             VendorService.delete_vendor_by_id(vendor_id)
             return {"message": f"Vendor with provided id, {vendor_id} has been deleted."}
+        except VendorNotFoundException as e:
+            raise HTTPException(status_code=e.code, detail=e.message)
         except Exception as e:
             raise HTTPException(status_code=400, detail=str(e))

@@ -1,7 +1,7 @@
 import hashlib
 
 from app.db import SessionLocal
-from app.users.exceptions import UserInvalidPassword
+from app.users.exceptions import UserInvalidPassword, UserNotFoundException, UserNotActiveException
 from app.users.reporistories import UserRepository, UserHasRoleRepository, RoleRepository
 
 
@@ -30,6 +30,12 @@ class UserService:
             return user_repository.read_all_users()
 
     @staticmethod
+    def read_all_active_users():
+        with SessionLocal() as db:
+            user_repository = UserRepository(db)
+            return user_repository.read_all_active_users()
+
+    @staticmethod
     def read_all_admins():
         with SessionLocal() as db:
             try:
@@ -53,6 +59,9 @@ class UserService:
         with SessionLocal() as db:
             try:
                 user_repository = UserRepository(db)
+                user = user_repository.read_user_by_id(user_id)
+                if not user:
+                    raise UserNotFoundException(message="User not found in the system.", code=404)
                 return user_repository.update_user_is_active(user_id, is_active)
             except Exception as e:
                 raise e
@@ -62,6 +71,14 @@ class UserService:
         try:
             with SessionLocal() as db:
                 user_repository = UserRepository(db)
+                user = user_repository.read_user_by_id(user_id)
+                if not user:
+                    raise UserNotFoundException(message="User not found in the system.", code=404)
+                user_has_role_repository = UserHasRoleRepository(db)
+                user_has_roles = user_has_role_repository.read_user_has_roles_by_user_id(user_id)
+                for user_has_role in user_has_roles:
+                    if user_has_role:
+                        user_has_role_repository.delete_user_has_role_by_id(user_has_role.user_has_role_id)
                 return user_repository.delete_user_by_id(user_id)
         except Exception as e:
             raise e
@@ -72,8 +89,12 @@ class UserService:
             try:
                 user_repository = UserRepository(db)
                 user = user_repository.read_user_by_email(email)
+                if not user:
+                    raise UserNotFoundException(message="User not found in the system.", code=404)
+                if not user.is_active:
+                    raise UserNotActiveException(message="User not active. Activate user to enable access", code=401)
                 if hashlib.sha256(bytes(password, "utf-8")).hexdigest() != user.password:
-                    raise UserInvalidPassword(message="Invalid password for user", code=401)
+                    raise UserInvalidPassword(message="Invalid password for user.", code=401)
                 return user
             except Exception as e:
                 raise e

@@ -13,7 +13,8 @@ def create_vendor(transaction: TransactionSchemaIn):
                                                            transaction.user_id,
                                                            transaction.vendor_id,
                                                            transaction.outbound,
-                                                           transaction.currency)
+                                                           transaction.currency,
+                                                           transaction.cash_payment)
     return transaction
 
 
