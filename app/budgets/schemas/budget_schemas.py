@@ -1,5 +1,9 @@
 from typing import Optional
 from pydantic import BaseModel, UUID4
+from datetime import date
+
+from app.categories.schemas import CategorySchema
+from app.users.schemas import UserSchema
 
 
 class BudgetSchema(BaseModel):
@@ -7,11 +11,14 @@ class BudgetSchema(BaseModel):
     name: str
     user_id: str
     category_id: str
-    start_date: str
-    end_date: str
+    start_date: date
+    end_date: date
     currency: str
     balance: float
     is_active: bool
+
+    user: UserSchema
+    category: CategorySchema
 
     class Config:
         orm_mode = True

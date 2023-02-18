@@ -1,5 +1,10 @@
+from app.budgets.exceptions import BudgetNotFoundException
 from app.budgets.repositories import BudgetRepository
+from app.categories.exceprtions import CategoryNotActiveException, CategoryNotFoundException
+from app.categories.repositories import CategoryRepository
 from app.db import SessionLocal
+from app.users.exceptions import UserNotActiveException, UserNotFoundException
+from app.users.reporistories import UserRepository
 
 
 class BudgetService:
@@ -15,6 +20,20 @@ class BudgetService:
         with SessionLocal() as db:
             try:
                 budget_repository = BudgetRepository(db)
+                user_repository = UserRepository(db)
+                category_repository = CategoryRepository(db)
+                user = user_repository.read_user_by_id(user_id)
+                if not user:
+                    raise UserNotFoundException(message="User not found in the system.", code=404)
+                if not user.is_active:
+                    raise UserNotActiveException(message="User not active. Activate user to enable budget assignment.",
+                                                 code=401)
+                category = category_repository.read_category_by_id(category_id)
+                if not category:
+                    raise CategoryNotFoundException(message="Category not found in the system.", code=404)
+                if not category.is_active:
+                    raise CategoryNotActiveException(message="Category not active. Activate category to enable "
+                                                             "budget assignment.", code=401)
                 return budget_repository.create_budget(name,
                                                        user_id,
                                                        category_id,
@@ -60,6 +79,10 @@ class BudgetService:
         with SessionLocal() as db:
             try:
                 budget_repository = BudgetRepository(db)
+                budget = budget_repository.read_budget_by_id(budget_id)
+                if not budget:
+                    raise BudgetNotFoundException(message="Budget not found in the system.",
+                                                  code=404)
                 return budget_repository.update_budget_is_active(budget_id, is_active)
             except Exception as e:
                 raise e
@@ -76,6 +99,10 @@ class BudgetService:
         with SessionLocal() as db:
             try:
                 budget_repository = BudgetRepository(db)
+                budget = budget_repository.read_budget_by_id(budget_id)
+                if not budget:
+                    raise BudgetNotFoundException(message="Budget not found in the system.",
+                                                  code=404)
                 return budget_repository.update_budget_by_id(budget_id,
                                                              name,
                                                              user_id,
@@ -92,6 +119,10 @@ class BudgetService:
         try:
             with SessionLocal() as db:
                 budget_repository = BudgetRepository(db)
+                budget = budget_repository.read_budget_by_id(budget_id)
+                if not budget:
+                    raise BudgetNotFoundException(message="Budget not found in the system.",
+                                                  code=404)
                 return budget_repository.delete_budget_by_id(budget_id)
         except Exception as e:
             raise e

@@ -27,6 +27,10 @@ class UserRepository:
         users = self.db.query(User).all()
         return users
 
+    def read_all_active_users(self) -> [User]:
+        users = self.db.query(User).filter(User.is_active == True).all()
+        return users
+
     def read_user_by_email(self, email: str) -> User:
         user = self.db.query(User).filter(User.email == email).first()
         return user

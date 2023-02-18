@@ -1,6 +1,7 @@
 from fastapi import HTTPException
 from sqlalchemy.exc import IntegrityError
 
+from app.users.exceptions.role_exceptions import RoleNotFoundException
 from app.users.services import RoleService
 
 
@@ -42,5 +43,7 @@ class RoleController:
         try:
             RoleService.delete_role_by_id(role_id)
             return {"message": f"Role with provided id, {role_id} has been deleted."}
+        except RoleNotFoundException as e:
+            raise HTTPException(status_code=e.code, detail=e.message)
         except Exception as e:
             raise HTTPException(status_code=400, detail=str(e))

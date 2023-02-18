@@ -17,6 +17,7 @@ class Transaction(Base):
     user_id = Column(String(50), ForeignKey("users.user_id"), nullable=False, unique=False)
     vendor_id = Column(String(50), ForeignKey("vendors.vendor_id"), nullable=False, unique=False)
     is_valid = Column(Boolean, default=True)
+    cash_payment = Column(Boolean, default=True)
 
     user = relationship("User", lazy="subquery")
     vendor = relationship("Vendor", lazy="subquery")
@@ -27,6 +28,7 @@ class Transaction(Base):
                  vendor_id: str,
                  outbound: bool = True,
                  currency: str = "DIN",
+                 cash_payment: bool = True,
                  transaction_time: datetime = datetime.utcnow(),
                  is_valid: bool = True):
         self.amount = amount
@@ -36,3 +38,4 @@ class Transaction(Base):
         self.currency = currency
         self.transaction_time = transaction_time
         self.is_valid = is_valid
+        self.cash_payment = cash_payment

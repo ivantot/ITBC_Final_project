@@ -1,4 +1,7 @@
+from app.categories.exceprtions import CategoryNotActiveException, CategoryNotFoundException
+from app.categories.repositories import CategoryRepository
 from app.db import SessionLocal
+from app.vendors.exceptions import VendorNotFoundException
 from app.vendors.repositories import VendorRepository
 
 
@@ -12,6 +15,13 @@ class VendorService:
         with SessionLocal() as db:
             try:
                 vendor_repository = VendorRepository(db)
+                category_repository = CategoryRepository(db)
+                category = category_repository.read_category_by_id(category_id)
+                if not category:
+                    raise CategoryNotFoundException(message="Category not found in the system.", code=404)
+                if not category.is_active:
+                    raise CategoryNotActiveException(message="Category not active. Activate category to enable "
+                                                             "vendor assignment.", code=401)
                 return vendor_repository.create_vendor(name, address, category_id, cash_only)
             except Exception as e:
                 raise e
@@ -45,6 +55,10 @@ class VendorService:
         with SessionLocal() as db:
             try:
                 vendor_repository = VendorRepository(db)
+                vendor = vendor_repository.read_vendor_by_id(vendor_id)
+                if not vendor:
+                    raise VendorNotFoundException(message="Vendor not found in the system.",
+                                                  code=404)
                 return vendor_repository.update_vendor_is_active(vendor_id, is_active)
             except Exception as e:
                 raise e
@@ -54,6 +68,9 @@ class VendorService:
         with SessionLocal() as db:
             try:
                 vendor_repository = VendorRepository(db)
+                vendor = vendor_repository.read_vendor_by_id(vendor_id)
+                if not vendor:
+                    raise VendorNotFoundException(message="Vendor not found in the system.", code=404)
                 return vendor_repository.update_vendor_cash_only(vendor_id, cash_only)
             except Exception as e:
                 raise e
@@ -63,6 +80,10 @@ class VendorService:
         with SessionLocal() as db:
             try:
                 vendor_repository = VendorRepository(db)
+                vendor = vendor_repository.read_vendor_by_id(vendor_id)
+                if not vendor:
+                    raise VendorNotFoundException(message="Vendor not found in the system.",
+                                                  code=404)
                 return vendor_repository.update_vendor_by_id(vendor_id, name, address)
             except Exception as e:
                 raise e
@@ -72,6 +93,10 @@ class VendorService:
         try:
             with SessionLocal() as db:
                 vendor_repository = VendorRepository(db)
+                vendor = vendor_repository.read_vendor_by_id(vendor_id)
+                if not vendor:
+                    raise VendorNotFoundException(message="Vendor not found in the system.",
+                                                  code=404)
                 return vendor_repository.delete_vendor_by_id(vendor_id)
         except Exception as e:
             raise e

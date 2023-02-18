@@ -14,13 +14,15 @@ class TransactionRepository:
                            user_id: str,
                            vendor_id: str,
                            outbound: bool = True,
-                           currency: str = "DIN") -> Transaction:
+                           currency: str = "DIN",
+                           cash_payment: bool = True) -> Transaction:
         try:
             transaction = Transaction(amount,
                                       user_id,
                                       vendor_id,
                                       outbound,
-                                      currency)
+                                      currency,
+                                      cash_payment)
             self.db.add(transaction)
             self.db.commit()
             self.db.refresh(transaction)

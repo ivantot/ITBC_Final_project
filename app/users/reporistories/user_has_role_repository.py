@@ -27,6 +27,10 @@ class UserHasRoleRepository:
         user_has_roles = self.db.query(UserHasRole).filter(UserHasRole.user_id == user_id).all()
         return user_has_roles
 
+    def read_all_users_have_roles(self) -> list[UserHasRole]:
+        users_have_roles = self.db.query(UserHasRole).all()
+        return users_have_roles
+
     def delete_user_has_role_by_id(self, user_has_role_id: str) -> bool:
         try:
             user_has_role = self.db.query(UserHasRole).filter(UserHasRole.user_has_role_id == user_has_role_id).first()

@@ -1,6 +1,7 @@
 from uuid import uuid4
+from datetime import datetime
 
-from sqlalchemy import Column, String, Boolean, Float, ForeignKey, Date
+from sqlalchemy import Column, String, Boolean, Float, ForeignKey, Date, UniqueConstraint, CheckConstraint
 from sqlalchemy.orm import relationship
 
 from app.db import Base
@@ -17,6 +18,8 @@ class Budget(Base):
     is_active = Column(Boolean, default=True)
     user_id = Column(String(50), ForeignKey("users.user_id"), nullable=False, unique=False)
     category_id = Column(String(50), ForeignKey("categories.category_id"), nullable=False, unique=False)
+    __table_args__ = (UniqueConstraint("user_id", "category_id", name="user_category_uc"),
+                      CheckConstraint(start_date < end_date, name='start_end_cc'))
 
     user = relationship("User", lazy="subquery")
     category = relationship("Category", lazy="subquery")
@@ -32,8 +35,8 @@ class Budget(Base):
         self.name = name
         self.user_id = user_id
         self.category_id = category_id
-        self.start_date = start_date
-        self.end_date = end_date
+        self.start_date = datetime.strptime(start_date, "%Y-%m-%d")
+        self.end_date = datetime.strptime(end_date, "%Y-%m-%d")
         self.currency = currency
         self.balance = balance
         self.is_active = is_active

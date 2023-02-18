@@ -2,7 +2,8 @@ from fastapi import APIRouter, Depends
 
 from app.users.controllers import UserController, RoleController, UserHasRoleController
 from app.users.controllers.user_auth_controller import JWTBearer
-from app.users.schemas import RoleSchemaIn, RoleSchema, UserSchema, UserSchemaIn, UserHasRoleSchema, UserHasRoleSchemaIn
+from app.users.schemas import RoleSchemaIn, RoleSchema, UserSchema, UserSchemaIn, UserHasRoleSchema, \
+    UserHasRoleSchemaIn, UserWithRolesSchema
 
 admin_router = APIRouter(tags=["Admin - run once to add initial admin and roles"], prefix="/api/admin")
 user_router = APIRouter(tags=["Users"], prefix="/api/users")
@@ -41,6 +42,16 @@ def get_user_by_id(user_id: str):
 @user_router.get("/get-all-users", response_model=list[UserSchema])
 def get_all_users():
     return UserController.read_all_users()
+
+
+@user_router.get("/get-all-users-with-roles", response_model=list[UserWithRolesSchema])
+def get_all_users_with_roles():
+    return UserController.read_all_users()
+
+
+@user_router.get("/get-all-active-users", response_model=list[UserSchema])
+def get_all_active_users():
+    return UserController.read_all_active_users()
 
 
 @user_router.get("/get-all-admins", response_model=list[UserSchema])
@@ -96,6 +107,11 @@ def get_user_has_role_by_id(user_has_role_id: str):
 @user_has_role_router.get("/user-id", response_model=list[UserHasRoleSchema])
 def get_user_has_roles_by_user_id(user_id: str):
     return UserHasRoleController.read_user_has_roles_by_user_id(user_id)
+
+
+@user_has_role_router.get("/users-have-roles", response_model=list[UserHasRoleSchema])
+def get_all_users_have_roles():
+    return UserHasRoleController.read_all_users_have_roles()
 
 
 @user_has_role_router.delete("/", dependencies=[Depends(JWTBearer("ADMIN"))])

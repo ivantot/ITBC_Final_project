@@ -70,7 +70,7 @@ class VendorRepository:
             if name is not None:
                 vendor.name = name
             if address is not None:
-                vendor.name = address
+                vendor.address = address
             self.db.add(vendor)
             self.db.commit()
             self.db.refresh(vendor)

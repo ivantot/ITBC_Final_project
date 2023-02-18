@@ -34,7 +34,7 @@ class BudgetRepository:
             raise e
 
     def read_budget_by_id(self, budget_id: str) -> Budget:
-        budget = self.db.query(Budget).filter(Budget.category_id == budget_id).first()
+        budget = self.db.query(Budget).filter(Budget.budget_id == budget_id).first()
         return budget
 
     def read_budgets_by_user_id(self, user_id: str) -> [Budget]:
