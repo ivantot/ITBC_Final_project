@@ -16,6 +16,7 @@ class BudgetRepository:
                       category_id: str,
                       start_date: str,
                       end_date: str,
+                      limit: float,
                       currency: str = "DIN",
                       balance: float = 0.0) -> Budget:
         try:
@@ -24,6 +25,7 @@ class BudgetRepository:
                             category_id,
                             start_date,
                             end_date,
+                            limit,
                             currency,
                             balance)
             self.db.add(budget)
@@ -71,7 +73,8 @@ class BudgetRepository:
                             start_date: str = None,
                             end_date: str = None,
                             currency: str = None,
-                            balance: float = None) -> Budget:
+                            balance: float = None,
+                            limit: float = None) -> Budget:
         try:
             budget = self.db.query(Budget).filter(Budget.budget_id == budget_id).first()
             if budget is None:
@@ -90,6 +93,8 @@ class BudgetRepository:
                 budget.currency = currency
             if balance is not None:
                 budget.balance = balance
+            if limit is not None:
+                budget.limit = limit
             self.db.add(budget)
             self.db.commit()
             self.db.refresh(budget)

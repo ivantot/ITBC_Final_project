@@ -1,10 +1,14 @@
 from datetime import datetime
 from uuid import uuid4
 
-from sqlalchemy import Column, String, Boolean, Float, ForeignKey, DateTime
+from sqlalchemy import Column, String, Boolean, Float, ForeignKey, DateTime, CheckConstraint
 from sqlalchemy.orm import relationship
 
 from app.db import Base
+
+from app.config import settings
+
+CURRENCIES = settings.CURRENCIES.split(",")
 
 
 class Transaction(Base):
@@ -18,6 +22,7 @@ class Transaction(Base):
     vendor_id = Column(String(50), ForeignKey("vendors.vendor_id"), nullable=False, unique=False)
     is_valid = Column(Boolean, default=True)
     cash_payment = Column(Boolean, default=True)
+    __table_args__ = (CheckConstraint(currency.in_(CURRENCIES), name='transaction_currencies_cc'),)
 
     user = relationship("User", lazy="subquery")
     vendor = relationship("Vendor", lazy="subquery")

@@ -1,8 +1,12 @@
 from app.db import SessionLocal
-from app.money_accounts.exceptions import MoneyAccountNotFoundException
+from app.money_accounts.exceptions import MoneyAccountNotFoundException, CurrencyNotAllowedException
 from app.money_accounts.repositiories import MoneyAccountRepository
 from app.users.exceptions import UserNotActiveException, UserNotFoundException
 from app.users.reporistories import UserRepository
+
+from app.config import settings
+
+CURRENCIES = settings.CURRENCIES.split(",")
 
 
 class MoneyAccountService:
@@ -20,6 +24,8 @@ class MoneyAccountService:
                 if not user.is_active:
                     raise UserNotActiveException(message="User not active. Activate user to enable role assignment.",
                                                  code=401)
+                if currency not in CURRENCIES:
+                    raise CurrencyNotAllowedException(message="Currency not allowed. Use DIN or EUR.", code=401)
                 return money_account_repository.create_money_account(name, user_id, currency, balance)
             except Exception as e:
                 raise e
@@ -82,6 +88,8 @@ class MoneyAccountService:
                 if not money_account:
                     raise MoneyAccountNotFoundException(message="Money account not found in the system.",
                                                         code=404)
+                if currency and currency not in CURRENCIES:
+                    raise CurrencyNotAllowedException(message="Currency not allowed. Use DIN or EUR.", code=401)
                 return money_account_repository.update_money_account_by_id(money_account_id,
                                                                            user_id,
                                                                            name,

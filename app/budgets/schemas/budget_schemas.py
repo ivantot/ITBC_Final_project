@@ -15,6 +15,7 @@ class BudgetSchema(BaseModel):
     end_date: date
     currency: str
     balance: float
+    limit: float
     is_active: bool
 
     user: UserSchema
@@ -31,7 +32,7 @@ class BudgetSchemaIn(BaseModel):
     start_date: str
     end_date: str
     currency: str
-    balance: float
+    limit: float
 
     class Config:
         orm_mode = True
@@ -44,6 +45,7 @@ class BudgetSchemaUpdate(BaseModel):
     start_date: Optional[str]
     end_date: Optional[str]
     currency: Optional[str]
+    limit: Optional[float]
     balance: Optional[float]
 
     class Config:

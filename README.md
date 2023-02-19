@@ -70,6 +70,18 @@ From PyCharm
 uvicorn app.main:app --reload --reload-delay 5 --host localhost --port 8000
 ```
 
+## Once in docs / postman
+Use startup route to set up admin and basic roles  
+`/api/admin/setup-admin`
+
+## Other consideration
+At the moment DIN and EUR are only supported currency in the application.  
+Transaction deduct funds from money account.   
+Budget is an arbitrary amount of money assigned by user to a category during a period of time. Not connected to money account.  
+Transactions can be inbound and outbound by nature.  
+There must be a vendor, budget and category as well as a user with a money account for a transaction to take place.  
+
+
 [//]: # (## Contributing)
 
 [//]: # ()

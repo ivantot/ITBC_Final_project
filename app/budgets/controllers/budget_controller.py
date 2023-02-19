@@ -1,8 +1,10 @@
 from fastapi import HTTPException
 
-from app.budgets.exceptions import BudgetNotFoundException
+from app.budgets.exceptions import BudgetNotFoundException, StartAfterEndDateException, \
+    ActiveBudgetForCategoryExistsException
 from app.budgets.services import BudgetService
 from app.categories.exceprtions import CategoryNotActiveException, CategoryNotFoundException
+from app.money_accounts.exceptions import CurrencyNotAllowedException
 from app.users.exceptions import UserNotActiveException, UserNotFoundException
 
 
@@ -14,6 +16,7 @@ class BudgetController:
                       category_id: str,
                       start_date: str,
                       end_date: str,
+                      limit,
                       currency: str = "DIN",
                       balance: float = 0.0):
         try:
@@ -22,6 +25,7 @@ class BudgetController:
                                                  category_id,
                                                  start_date,
                                                  end_date,
+                                                 limit,
                                                  currency,
                                                  balance)
             return budget
@@ -32,6 +36,12 @@ class BudgetController:
         except CategoryNotFoundException as e:
             raise HTTPException(status_code=e.code, detail=e.message)
         except CategoryNotActiveException as e:
+            raise HTTPException(status_code=e.code, detail=e.message)
+        except ActiveBudgetForCategoryExistsException as e:
+            raise HTTPException(status_code=e.code, detail=e.message)
+        except StartAfterEndDateException as e:
+            raise HTTPException(status_code=e.code, detail=e.message)
+        except CurrencyNotAllowedException as e:
             raise HTTPException(status_code=e.code, detail=e.message)
         except Exception as e:
             raise HTTPException(status_code=500, detail=str(e))
@@ -92,17 +102,21 @@ class BudgetController:
                             start_date: str = None,
                             end_date: str = None,
                             currency: str = None,
+                            limit: float = None,
                             balance: float = None):
         try:
-            return BudgetService.update_budget_by_id(budget_id,
-                                                     name,
-                                                     user_id,
-                                                     category_id,
-                                                     start_date,
-                                                     end_date,
-                                                     currency,
-                                                     balance)
+            return BudgetService.update_budget_by_id(budget_id=budget_id,
+                                                     name=name,
+                                                     user_id=user_id,
+                                                     category_id=category_id,
+                                                     start_date=start_date,
+                                                     end_date=end_date,
+                                                     currency=currency,
+                                                     limit=limit,
+                                                     balance=balance)
         except BudgetNotFoundException as e:
+            raise HTTPException(status_code=e.code, detail=e.message)
+        except CurrencyNotAllowedException as e:
             raise HTTPException(status_code=e.code, detail=e.message)
         except Exception as e:
             raise HTTPException(status_code=500, detail=str(e))

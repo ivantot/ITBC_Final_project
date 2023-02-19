@@ -1,7 +1,7 @@
 from fastapi import HTTPException
 from sqlalchemy.exc import IntegrityError
 
-from app.money_accounts.exceptions import MoneyAccountNotFoundException
+from app.money_accounts.exceptions import MoneyAccountNotFoundException, CurrencyNotAllowedException
 from app.money_accounts.services import MoneyAccountService
 from app.users.exceptions import UserNotActiveException, UserNotFoundException
 
@@ -17,6 +17,8 @@ class MoneyAccountController:
         except UserNotFoundException as e:
             raise HTTPException(status_code=e.code, detail=e.message)
         except UserNotActiveException as e:
+            raise HTTPException(status_code=e.code, detail=e.message)
+        except CurrencyNotAllowedException as e:
             raise HTTPException(status_code=e.code, detail=e.message)
         except IntegrityError:
             raise HTTPException(status_code=400, detail=f"Money account with provided user id - {user_id} already "
@@ -78,6 +80,8 @@ class MoneyAccountController:
                                                                   name,
                                                                   currency,
                                                                   balance)
+        except CurrencyNotAllowedException as e:
+            raise HTTPException(status_code=e.code, detail=e.message)
         except MoneyAccountNotFoundException as e:
             raise HTTPException(status_code=e.code, detail=e.message)
         except Exception as e:
