@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends
 
 from app.budgets.controllers import BudgetController
-from app.budgets.schemas import BudgetSchema, BudgetSchemaIn, BudgetSchemaUpdate
+from app.budgets.schemas import BudgetSchema, BudgetSchemaIn, BudgetSchemaUpdate, BudgetFundsSchema
 from app.users.controllers.user_auth_controller import JWTBearer
 
 budget_router = APIRouter(tags=["Budgets"], prefix="/api/budgets")
@@ -65,3 +65,8 @@ def update_budget_by_id(budget_id: str, budget: BudgetSchemaUpdate = None):
 @budget_router.delete("/", dependencies=[Depends(JWTBearer("ADMIN"))])
 def delete_budget_by_id(budget_id: str):
     return BudgetController.delete_budget_by_id(budget_id)
+
+
+@budget_router.get("/show-budgets-funds-by-user-id", response_model=dict[str, list[BudgetFundsSchema]])
+def show_budgets_funds_per_category_by_user_id(user_id: str):
+    return BudgetController.show_budgets_funds_per_category_by_user_id(user_id)

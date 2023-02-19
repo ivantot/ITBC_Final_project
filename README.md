@@ -79,7 +79,14 @@ At the moment DIN and EUR are only supported currency in the application.
 Transaction deduct funds from money account.   
 Budget is an arbitrary amount of money assigned by user to a category during a period of time. Not connected to money account.  
 Transactions can be inbound and outbound by nature.  
-There must be a vendor, budget and category as well as a user with a money account for a transaction to take place.  
+There must be a vendor, budget and category as well as a user with a money account for a transaction to take place.
+
+
+## Notable endpoints:  
+-    `/api/budgets/show-budgets-funds-by-user-id`
+-    `/api/transactions/get-transactions-in-time-by-user-id`
+-    `/api/transactions/get-transactions-by-vendor-id`
+
 
 
 [//]: # (## Contributing)

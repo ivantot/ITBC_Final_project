@@ -1,7 +1,10 @@
+from typing import Dict
+
 from fastapi import HTTPException
 
 from app.budgets.exceptions import BudgetNotFoundException, StartAfterEndDateException, \
     ActiveBudgetForCategoryExistsException
+from app.budgets.models import Budget
 from app.budgets.services import BudgetService
 from app.categories.exceprtions import CategoryNotActiveException, CategoryNotFoundException
 from app.money_accounts.exceptions import CurrencyNotAllowedException
@@ -130,3 +133,11 @@ class BudgetController:
             raise HTTPException(status_code=e.code, detail=e.message)
         except Exception as e:
             raise HTTPException(status_code=400, detail=str(e))
+
+    @staticmethod
+    def show_budgets_funds_per_category_by_user_id(user_id: str) -> Dict[str, list[Budget]]:
+        budgets = BudgetService.show_budgets_funds_per_category_by_user_id(user_id)
+        if budgets:
+            return budgets
+        else:
+            raise HTTPException(status_code=400, detail=f"Budgets with provided user id {user_id} do not exist.")

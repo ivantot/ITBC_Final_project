@@ -1,5 +1,8 @@
+from typing import Dict
+
 from app.budgets.exceptions import BudgetNotFoundException, StartAfterEndDateException, \
     ActiveBudgetForCategoryExistsException
+from app.budgets.models import Budget
 from app.budgets.repositories import BudgetRepository
 from app.categories.exceprtions import CategoryNotActiveException, CategoryNotFoundException
 from app.categories.repositories import CategoryRepository
@@ -45,7 +48,7 @@ class BudgetService:
                 for budget in users_budgets:
                     if budget.category_id == category_id:
                         if budget.is_active:
-                            raise ActiveBudgetForCategoryExistsException(message="Active budget for selected category"
+                            raise ActiveBudgetForCategoryExistsException(message="Active budget for selected category "
                                                                                  "already exists. Deactivate and create"
                                                                                  "new budget, or use existing.",
                                                                          code=401)
@@ -149,3 +152,16 @@ class BudgetService:
                 return budget_repository.delete_budget_by_id(budget_id)
         except Exception as e:
             raise e
+
+    @staticmethod
+    def show_budgets_funds_per_category_by_user_id(user_id: str) -> Dict[str, list[Budget]]:
+        with SessionLocal() as db:
+            budget_repository = BudgetRepository(db)
+            budgets = budget_repository.read_budgets_by_user_id(user_id)
+            budgets_by_categories = {}
+            for budget in budgets:
+                if budget.category.name not in budgets_by_categories:
+                    budgets_by_categories[budget.category.name] = [budget]
+                else:
+                    budgets_by_categories[budget.category.name].append(budget)
+            return budgets_by_categories
