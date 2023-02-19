@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
@@ -65,3 +67,10 @@ class TransactionRepository:
             return True
         except Exception as e:
             raise e
+
+    def read_transactions_in_time_by_user_id(self, user_id: str, start_date: str, end_date: str) -> [Transaction]:
+        transactions = self.db.query(Transaction).filter(Transaction.user_id == user_id,
+                                                         Transaction.transaction_time.between
+                                                         (datetime.strptime(start_date, "%Y-%m-%d"),
+                                                          datetime.strptime(end_date, "%Y-%m-%d"))).all()
+        return transactions

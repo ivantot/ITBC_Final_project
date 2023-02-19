@@ -1,3 +1,5 @@
+
+
 from fastapi import HTTPException
 
 from app.budgets.exceptions import BudgetNotFoundException, BudgetNotActiveException, TransactionBudgetTimeException
@@ -102,3 +104,21 @@ class TransactionController:
             raise HTTPException(status_code=e.code, detail=e.message)
         except Exception as e:
             raise HTTPException(status_code=400, detail=str(e))
+
+    @staticmethod
+    def read_transactions_in_time_by_user_id(user_id: str, start_date: str, end_date: str):
+        transactions = TransactionService.read_transactions_in_time_by_user_id(user_id, start_date, end_date)
+        if transactions:
+            return transactions
+        elif not TransactionService.read_transactions_by_user_id(user_id):
+            raise HTTPException(status_code=400, detail=f"Transactions with provided user id {user_id} do not exist.")
+        else:
+            raise HTTPException(status_code=400, detail=f"No transactions between {start_date} and {end_date}.")
+
+    @staticmethod
+    def show_spending_habits_by_user_id(user_id: str):
+        transactions = TransactionService.show_spending_habits_by_user_id(user_id)
+        if transactions:
+            return transactions
+        else:
+            raise HTTPException(status_code=400, detail=f"Transactions with provided user id {user_id} do not exist.")

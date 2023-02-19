@@ -25,6 +25,17 @@ class BudgetSchema(BaseModel):
         orm_mode = True
 
 
+class BudgetFundsSchema(BaseModel):
+    name: str
+    currency: str
+    balance: float
+    limit: float
+    is_active: bool
+
+    class Config:
+        orm_mode = True
+
+
 class BudgetSchemaIn(BaseModel):
     name: str
     user_id: str

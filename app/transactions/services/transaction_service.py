@@ -95,7 +95,7 @@ class TransactionService:
                 else:
                     budget_amount = amount
                 budget_repository.update_budget_by_id(budget_id=relevant_budget.budget_id,
-                                                      balance=relevant_budget.balance+budget_amount)
+                                                      balance=relevant_budget.balance + budget_amount)
                 return transaction_repository.create_transaction(amount,
                                                                  user_id,
                                                                  vendor_id,
@@ -154,3 +154,32 @@ class TransactionService:
                 return transaction_repository.delete_transaction_by_id(transaction_id)
         except Exception as e:
             raise e
+
+    @staticmethod
+    def read_transactions_in_time_by_user_id(user_id: str, start_date: str, end_date: str):
+        with SessionLocal() as db:
+            transaction_repository = TransactionRepository(db)
+            return transaction_repository.read_transactions_in_time_by_user_id(user_id, start_date, end_date)
+
+    @staticmethod
+    def show_spending_habits_by_user_id(user_id: str) -> dict[str, str]:
+        with SessionLocal() as db:
+            transaction_repository = TransactionRepository(db)
+            transactions = transaction_repository.read_transactions_by_user_id(user_id)
+            total_spent_by_category = {}
+            total_amount_spent = 0
+            for transaction in transactions:
+                if transaction.outbound:
+                    if transaction.currency != "DIN":
+                        converted_amount = convert_money_by_currency(transaction.amount, transaction.currency, "DIN")
+                    else:
+                        converted_amount = transaction.amount
+                    if transaction.vendor.category.name not in total_spent_by_category:
+                        total_spent_by_category[transaction.vendor.category.name] = converted_amount
+                    else:
+                        total_spent_by_category[transaction.vendor.category.name] += converted_amount
+                    total_amount_spent += converted_amount
+            unpacked_spending_habits = {k: str(round((v/total_amount_spent)*100, 2))+"%"
+                                        for (k, v) in total_spent_by_category.items()}
+            unpacked_spending_habits["total amount spent"] = str(total_amount_spent)+" DIN"
+            return unpacked_spending_habits

@@ -23,6 +23,19 @@ class TransactionSchema(BaseModel):
         orm_mode = True
 
 
+class TransactionVendorSchema(BaseModel):
+    transaction_id: UUID4
+    amount: float
+    outbound: bool
+    currency: str
+    transaction_time: datetime
+    is_valid: bool
+    cash_payment: bool
+
+    class Config:
+        orm_mode = True
+
+
 class TransactionSchemaIn(BaseModel):
     amount: float
     user_id: str

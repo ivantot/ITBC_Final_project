@@ -1,7 +1,8 @@
+
 from fastapi import APIRouter, Depends
 
 from app.transactions.controllers import TransactionController
-from app.transactions.schemas import TransactionSchema, TransactionSchemaIn
+from app.transactions.schemas import TransactionSchema, TransactionSchemaIn, TransactionVendorSchema
 from app.users.controllers.user_auth_controller import JWTBearer
 
 transaction_router = APIRouter(tags=["Transactions"], prefix="/api/transactions")
@@ -9,12 +10,12 @@ transaction_router = APIRouter(tags=["Transactions"], prefix="/api/transactions"
 
 @transaction_router.post("/add-new-transaction", response_model=TransactionSchema)
 def create_vendor(transaction: TransactionSchemaIn):
-    transaction = TransactionController.create_transaction(transaction.amount,
-                                                           transaction.user_id,
-                                                           transaction.vendor_id,
-                                                           transaction.outbound,
-                                                           transaction.currency,
-                                                           transaction.cash_payment)
+    transaction = TransactionController.create_transaction(amount=transaction.amount,
+                                                           user_id=transaction.user_id,
+                                                           vendor_id=transaction.vendor_id,
+                                                           outbound=transaction.outbound,
+                                                           currency=transaction.currency,
+                                                           cash_payment=transaction.cash_payment)
     return transaction
 
 
@@ -28,7 +29,7 @@ def get_transactions_by_user_id(user_id: str):
     return TransactionController.read_transactions_by_user_id(user_id)
 
 
-@transaction_router.get("/get-transactions-by-vendor-id", response_model=list[TransactionSchema])
+@transaction_router.get("/get-transactions-by-vendor-id", response_model=list[TransactionVendorSchema])
 def get_transactions_by_vendor_id(vendor_id: str):
     return TransactionController.read_transactions_by_vendor_id(vendor_id)
 
@@ -46,3 +47,13 @@ def update_transaction_is_valid(transaction_id: str, is_valid: bool):
 @transaction_router.delete("/", dependencies=[Depends(JWTBearer("ADMIN"))])
 def delete_transaction_by_id(transaction_id: str):
     return TransactionController.delete_transaction_by_id(transaction_id)
+
+
+@transaction_router.get("/get-transactions-in-time-by-user-id", response_model=list[TransactionSchema])
+def get_transactions_in_time_by_user_id(user_id: str, start_date: str, end_date: str):
+    return TransactionController.read_transactions_in_time_by_user_id(user_id, start_date, end_date)
+
+
+@transaction_router.get("/show-spending-habits-user-id", response_model=dict[str, str])
+def show_spending_habits_by_user_id(user_id: str):
+    return TransactionController.show_spending_habits_by_user_id(user_id)
