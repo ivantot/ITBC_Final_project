@@ -1,14 +1,23 @@
-from app.budgets.exceptions import BudgetNotFoundException, BudgetNotActiveException
+import datetime
+
+from app.budgets.exceptions import BudgetNotFoundException, BudgetNotActiveException, TransactionBudgetTimeException
 from app.budgets.repositories import BudgetRepository
+from app.categories.repositories import CategoryRepository
 from app.db import SessionLocal
-from app.money_accounts.exceptions import MoneyAccountNotFoundException, MoneyAccountNotActiveException
+from app.money_accounts.exceptions import MoneyAccountNotFoundException, MoneyAccountNotActiveException, \
+    CurrencyNotAllowedException, NotEnoughFundsInMoneyAccountException
 from app.money_accounts.repositiories import MoneyAccountRepository
-from app.transactions.exceptions import TransactionNotFoundException
+from app.transactions.exceptions import TransactionNotFoundException, TransactionCashOnlyException
 from app.transactions.repositories import TransactionRepository
 from app.users.exceptions import UserNotActiveException, UserNotFoundException
 from app.users.reporistories import UserRepository
+from app.utils import convert_money_by_currency
 from app.vendors.exceptions import VendorNotActiveException, VendorNotFoundException
 from app.vendors.repositories import VendorRepository
+
+from app.config import settings
+
+CURRENCIES = settings.CURRENCIES.split(",")
 
 
 class TransactionService:
@@ -25,6 +34,7 @@ class TransactionService:
                 transaction_repository = TransactionRepository(db)
                 user_repository = UserRepository(db)
                 vendor_repository = VendorRepository(db)
+                category_repository = CategoryRepository(db)
                 budget_repository = BudgetRepository(db)
                 money_account_repository = MoneyAccountRepository(db)
                 user = user_repository.read_user_by_id(user_id)
@@ -39,6 +49,7 @@ class TransactionService:
                 if not vendor.is_active:
                     raise VendorNotActiveException(message="Vendor not active. Activate vendor to enable "
                                                            "transaction assignment.", code=401)
+                category = category_repository.read_category_by_id(vendor.category_id)
                 budgets = budget_repository.read_budgets_by_user_id(user_id)
                 budget_categories = []
                 for budget in budgets:
@@ -46,7 +57,7 @@ class TransactionService:
                     if budget.category_id == vendor.category_id:
                         relevant_budget = budget
                 if vendor.category_id not in budget_categories:
-                    raise BudgetNotFoundException(message="User has no budget for selected category. "
+                    raise BudgetNotFoundException(message=f"User has no budget for {category.name}. "
                                                           "Create a budget.", code=404)
                 if not relevant_budget.is_active:
                     raise BudgetNotActiveException(message="Budget not active. Activate budget to enable "
@@ -59,6 +70,32 @@ class TransactionService:
                 if not money_account.is_active:
                     raise MoneyAccountNotActiveException(message="Money account not active. Activate money account"
                                                                  " to enable transaction assignment.", code=401)
+                if vendor.cash_only and not cash_payment:
+                    raise TransactionCashOnlyException(message="Vendor accepts only cash payments, "
+                                                               "other means are currently unavailable.",
+                                                       code=404)
+                if currency not in CURRENCIES:
+                    raise CurrencyNotAllowedException(message="Currency not allowed. Use DIN or EUR.", code=401)
+                if money_account.currency != currency:
+                    money_account_amount = convert_money_by_currency(amount, currency, money_account.currency)
+                else:
+                    money_account_amount = amount
+                if outbound and money_account.balance - money_account_amount < 0:
+                    raise NotEnoughFundsInMoneyAccountException(message="Not enough funds in money account. "
+                                                                        "Check balance.", code=401)
+                if not (relevant_budget.start_date < datetime.datetime.utcnow().date() < relevant_budget.end_date):
+                    raise TransactionBudgetTimeException(message="Transaction is not occurring within budget validity "
+                                                                 "period. Check budget start and end date.", code=401)
+                money_account_repository.update_money_account_by_id(money_account_id=money_account.money_account_id,
+                                                                    balance=money_account.balance - money_account_amount
+                                                                    if outbound
+                                                                    else money_account.balance + money_account_amount)
+                if relevant_budget.currency != currency:
+                    budget_amount = convert_money_by_currency(amount, currency, relevant_budget.currency)
+                else:
+                    budget_amount = amount
+                budget_repository.update_budget_by_id(budget_id=relevant_budget.budget_id,
+                                                      balance=relevant_budget.balance+budget_amount)
                 return transaction_repository.create_transaction(amount,
                                                                  user_id,
                                                                  vendor_id,

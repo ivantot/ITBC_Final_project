@@ -9,13 +9,13 @@ budget_router = APIRouter(tags=["Budgets"], prefix="/api/budgets")
 
 @budget_router.post("/add-new-budget", response_model=BudgetSchema)
 def create_category(budget: BudgetSchemaIn):
-    budget = BudgetController.create_budget(budget.name,
-                                            budget.user_id,
-                                            budget.category_id,
-                                            budget.start_date,
-                                            budget.end_date,
-                                            budget.currency,
-                                            budget.balance)
+    budget = BudgetController.create_budget(name=budget.name,
+                                            user_id=budget.user_id,
+                                            category_id=budget.category_id,
+                                            start_date=budget.start_date,
+                                            end_date=budget.end_date,
+                                            currency=budget.currency,
+                                            limit=budget.limit)
     return budget
 
 
@@ -51,14 +51,15 @@ def update_budget_is_active(budget_id: str, is_active: bool):
 
 @budget_router.put("/update", response_model=BudgetSchema)
 def update_budget_by_id(budget_id: str, budget: BudgetSchemaUpdate = None):
-    return BudgetController.update_budget_by_id(budget_id,
-                                                budget.name,
-                                                budget.user_id,
-                                                budget.category_id,
-                                                budget.start_date,
-                                                budget.end_date,
-                                                budget.currency,
-                                                budget.balance)
+    return BudgetController.update_budget_by_id(budget_id=budget_id,
+                                                name=budget.name,
+                                                user_id=budget.user_id,
+                                                category_id=budget.category_id,
+                                                start_date=budget.start_date,
+                                                end_date=budget.end_date,
+                                                currency=budget.currency,
+                                                limit=budget.limit,
+                                                balance=budget.balance)
 
 
 @budget_router.delete("/", dependencies=[Depends(JWTBearer("ADMIN"))])

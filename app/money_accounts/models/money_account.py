@@ -1,9 +1,13 @@
 from uuid import uuid4
 
-from sqlalchemy import Column, String, Boolean, Float, ForeignKey
+from sqlalchemy import Column, String, Boolean, Float, ForeignKey, CheckConstraint
 from sqlalchemy.orm import relationship
 
 from app.db import Base
+
+from app.config import settings
+
+CURRENCIES = settings.CURRENCIES.split(",")
 
 
 class MoneyAccount(Base):
@@ -14,6 +18,7 @@ class MoneyAccount(Base):
     currency = Column(String(10), default="DIN")
     balance = Column(Float, default=0.0)
     is_active = Column(Boolean, default=True)
+    __table_args__ = (CheckConstraint(currency.in_(CURRENCIES), name='money_account_currencies_cc'),)
 
     user = relationship("User", lazy="subquery")
 

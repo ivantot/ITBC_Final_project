@@ -10,6 +10,7 @@ class Settings(BaseSettings):
     DB_NAME: str
     USER_SECRET: str
     ALGORITHM: str
+    CURRENCIES: str
 
     class Config:
         env_file = './.env'

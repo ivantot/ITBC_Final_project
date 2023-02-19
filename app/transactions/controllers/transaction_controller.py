@@ -1,8 +1,9 @@
 from fastapi import HTTPException
 
-from app.budgets.exceptions import BudgetNotFoundException, BudgetNotActiveException
-from app.money_accounts.exceptions import MoneyAccountNotFoundException, MoneyAccountNotActiveException
-from app.transactions.exceptions import TransactionNotFoundException
+from app.budgets.exceptions import BudgetNotFoundException, BudgetNotActiveException, TransactionBudgetTimeException
+from app.money_accounts.exceptions import MoneyAccountNotFoundException, MoneyAccountNotActiveException, \
+    CurrencyNotAllowedException, NotEnoughFundsInMoneyAccountException
+from app.transactions.exceptions import TransactionNotFoundException, TransactionCashOnlyException
 from app.transactions.services import TransactionService
 from app.users.exceptions import UserNotActiveException, UserNotFoundException
 from app.vendors.exceptions import VendorNotActiveException, VendorNotFoundException
@@ -40,6 +41,14 @@ class TransactionController:
         except MoneyAccountNotFoundException as e:
             raise HTTPException(status_code=e.code, detail=e.message)
         except MoneyAccountNotActiveException as e:
+            raise HTTPException(status_code=e.code, detail=e.message)
+        except TransactionCashOnlyException as e:
+            raise HTTPException(status_code=e.code, detail=e.message)
+        except CurrencyNotAllowedException as e:
+            raise HTTPException(status_code=e.code, detail=e.message)
+        except NotEnoughFundsInMoneyAccountException as e:
+            raise HTTPException(status_code=e.code, detail=e.message)
+        except TransactionBudgetTimeException as e:
             raise HTTPException(status_code=e.code, detail=e.message)
         except Exception as e:
             raise HTTPException(status_code=500, detail=str(e))
