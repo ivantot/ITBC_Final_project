@@ -1,8 +1,9 @@
-
+from typing import Tuple
 from fastapi import APIRouter, Depends
 
 from app.transactions.controllers import TransactionController
-from app.transactions.schemas import TransactionSchema, TransactionSchemaIn, TransactionVendorSchema
+from app.transactions.schemas import TransactionSchema, TransactionSchemaIn, TransactionVendorSchema, \
+    TransactionInOutboundSchema
 from app.users.controllers.user_auth_controller import JWTBearer
 
 transaction_router = APIRouter(tags=["Transactions"], prefix="/api/transactions")
@@ -54,6 +55,27 @@ def get_transactions_in_time_by_user_id(user_id: str, start_date: str, end_date:
     return TransactionController.read_transactions_in_time_by_user_id(user_id, start_date, end_date)
 
 
-@transaction_router.get("/show-spending-habits-user-id", response_model=dict[str, str])
-def show_spending_habits_by_user_id(user_id: str):
-    return TransactionController.show_spending_habits_by_user_id(user_id)
+@transaction_router.get("/get-spending-habits-user-id", response_model=dict[str, str])
+def get_spending_habits_by_user_id(user_id: str):
+    return TransactionController.read_spending_habits_by_user_id(user_id)
+
+
+@transaction_router.get("/get-number-of-transactions-for-vendors-per-category")
+def get_number_of_transactions_for_vendors_per_category():
+    return TransactionController.read_number_of_transactions_for_vendors_per_category()
+
+
+@transaction_router.get("/get-favorite-vendors-per-category")
+def get_favorite_vendors_per_category():
+    return TransactionController.read_favorite_vendors_per_category()
+
+
+@transaction_router.get("/get-favorite-means-of-payment-by-user")
+def get_favorite_means_of_payment_by_user(user_id: str):
+    return TransactionController.read_favorite_means_of_payment_by_user(user_id)
+
+
+@transaction_router.get("/get-inbound-outbound-payments-by-user",
+                        response_model=Tuple[list[TransactionInOutboundSchema], str])
+def get_inbound_outbound_payments_by_user(user_id: str, transaction_type: str = "outbound"):
+    return TransactionController.read_inbound_outbound_payments_by_user(user_id, transaction_type)

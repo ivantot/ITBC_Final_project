@@ -83,9 +83,14 @@ There must be a vendor, budget and category as well as a user with a money accou
 
 
 ## Notable endpoints:  
--    `/api/budgets/show-budgets-funds-by-user-id`
+-    `/api/budgets/get-budgets-funds-by-user-id`
 -    `/api/transactions/get-transactions-in-time-by-user-id`
 -    `/api/transactions/get-transactions-by-vendor-id`
+-    `/api/transactions/get-spending-habits-user-id`
+-    `/api/transactions/get_number_of_transactions_for_vendors_per_category`
+-    `/api/transactions/get_favorite_vendors_per_category`
+-    `/api/transactions/get-favorite-means-of-payment-by-user`
+-    `/api/transactions/get-inbound-outbound-payments-by-user`
 
 
 

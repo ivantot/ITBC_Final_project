@@ -1,11 +1,10 @@
-
-
 from fastapi import HTTPException
 
 from app.budgets.exceptions import BudgetNotFoundException, BudgetNotActiveException, TransactionBudgetTimeException
 from app.money_accounts.exceptions import MoneyAccountNotFoundException, MoneyAccountNotActiveException, \
     CurrencyNotAllowedException, NotEnoughFundsInMoneyAccountException
-from app.transactions.exceptions import TransactionNotFoundException, TransactionCashOnlyException
+from app.transactions.exceptions import TransactionNotFoundException, TransactionCashOnlyException, \
+    IllegalParameterException
 from app.transactions.services import TransactionService
 from app.users.exceptions import UserNotActiveException, UserNotFoundException
 from app.vendors.exceptions import VendorNotActiveException, VendorNotFoundException
@@ -116,9 +115,44 @@ class TransactionController:
             raise HTTPException(status_code=400, detail=f"No transactions between {start_date} and {end_date}.")
 
     @staticmethod
-    def show_spending_habits_by_user_id(user_id: str):
-        transactions = TransactionService.show_spending_habits_by_user_id(user_id)
+    def read_spending_habits_by_user_id(user_id: str):
+        transactions = TransactionService.read_spending_habits_by_user_id(user_id)
         if transactions:
             return transactions
         else:
             raise HTTPException(status_code=400, detail=f"Transactions with provided user id {user_id} do not exist.")
+
+    @staticmethod
+    def read_number_of_transactions_for_vendors_per_category():
+        transactions = TransactionService.read_number_of_transactions_for_vendors_per_category()
+        if transactions:
+            return transactions
+        else:
+            raise HTTPException(status_code=400, detail=f"No transactions at all.")
+
+    @staticmethod
+    def read_favorite_vendors_per_category():
+        transactions = TransactionService.read_favorite_vendors_per_category()
+        if transactions:
+            return transactions
+        else:
+            raise HTTPException(status_code=400, detail=f"No transactions at all.")
+
+    @staticmethod
+    def read_favorite_means_of_payment_by_user(user_id: str):
+        transactions = TransactionService.read_favorite_means_of_payment_by_user(user_id)
+        if transactions:
+            return transactions
+        else:
+            raise HTTPException(status_code=400, detail=f"No transactions at all.")
+
+    @staticmethod
+    def read_inbound_outbound_payments_by_user(user_id: str, transaction_type: str = "outbound"):
+        try:
+            return TransactionService.read_inbound_outbound_payments_by_user(user_id, transaction_type)
+        except TransactionNotFoundException as e:
+            raise HTTPException(status_code=e.code, detail=e.message)
+        except IllegalParameterException as e:
+            raise HTTPException(status_code=e.code, detail=e.message)
+        except Exception as e:
+            raise HTTPException(status_code=400, detail=str(e))

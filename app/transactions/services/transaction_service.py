@@ -7,11 +7,12 @@ from app.db import SessionLocal
 from app.money_accounts.exceptions import MoneyAccountNotFoundException, MoneyAccountNotActiveException, \
     CurrencyNotAllowedException, NotEnoughFundsInMoneyAccountException
 from app.money_accounts.repositiories import MoneyAccountRepository
-from app.transactions.exceptions import TransactionNotFoundException, TransactionCashOnlyException
+from app.transactions.exceptions import TransactionNotFoundException, TransactionCashOnlyException, \
+    IllegalParameterException
 from app.transactions.repositories import TransactionRepository
 from app.users.exceptions import UserNotActiveException, UserNotFoundException
 from app.users.reporistories import UserRepository
-from app.utils import convert_money_by_currency
+from app.utils import convert_money_by_currency, EmailServices
 from app.vendors.exceptions import VendorNotActiveException, VendorNotFoundException
 from app.vendors.repositories import VendorRepository
 
@@ -81,6 +82,12 @@ class TransactionService:
                 else:
                     money_account_amount = amount
                 if outbound and money_account.balance - money_account_amount < 0:
+                    EmailServices.send_money_account_warning_email(email="ivan.tot@gmail.com",
+                                                                   amount=amount,
+                                                                   transaction_currency=currency,
+                                                                   balance=money_account.balance,
+                                                                   money_account_currency=money_account.currency,
+                                                                   user=user.email)
                     raise NotEnoughFundsInMoneyAccountException(message="Not enough funds in money account. "
                                                                         "Check balance.", code=401)
                 if not (relevant_budget.start_date < datetime.datetime.utcnow().date() < relevant_budget.end_date):
@@ -162,7 +169,7 @@ class TransactionService:
             return transaction_repository.read_transactions_in_time_by_user_id(user_id, start_date, end_date)
 
     @staticmethod
-    def show_spending_habits_by_user_id(user_id: str) -> dict[str, str]:
+    def read_spending_habits_by_user_id(user_id: str) -> dict[str, str]:
         with SessionLocal() as db:
             transaction_repository = TransactionRepository(db)
             transactions = transaction_repository.read_transactions_by_user_id(user_id)
@@ -179,7 +186,83 @@ class TransactionService:
                     else:
                         total_spent_by_category[transaction.vendor.category.name] += converted_amount
                     total_amount_spent += converted_amount
-            unpacked_spending_habits = {k: str(round((v/total_amount_spent)*100, 2))+"%"
+            unpacked_spending_habits = {k: str(round((v / total_amount_spent) * 100, 2)) + "%"
                                         for (k, v) in total_spent_by_category.items()}
-            unpacked_spending_habits["total amount spent"] = str(total_amount_spent)+" DIN"
+            unpacked_spending_habits["total amount spent"] = str(total_amount_spent) + " DIN"
             return unpacked_spending_habits
+
+    @staticmethod
+    def read_number_of_transactions_for_vendors_per_category():
+        with SessionLocal() as db:
+            transaction_repository = TransactionRepository(db)
+            category_repository = CategoryRepository(db)
+            vendor_repository = VendorRepository(db)
+            categories = category_repository.read_all_categories()
+            transactions = transaction_repository.read_all_transactions()
+            vendors = vendor_repository.read_all_vendors()
+            transactions_by_vendor = {}
+            favorite_by_category = {}
+            for vendor in vendors:
+                transactions_by_vendor[vendor.name] = 0
+                for transaction in transactions:
+                    if transaction.vendor.name == vendor.name:
+                        transactions_by_vendor[vendor.name] += 1
+            for category in categories:
+                favorite_by_category[category.name] = []
+                for vendor in transactions_by_vendor:
+                    vendor_obj = vendor_repository.read_vendor_by_name(vendor)
+                    if vendor_obj.category.name == category.name:
+                        favorite_by_category[category.name].append((vendor_obj.name,
+                                                                    transactions_by_vendor[vendor]))
+            return favorite_by_category
+
+    @staticmethod
+    def read_favorite_vendors_per_category():
+        data = TransactionService().read_number_of_transactions_for_vendors_per_category()
+        for category in data:
+            data[category].sort(key=lambda x: x[1], reverse=True)
+            data[category] = data[category][0][0]
+        return data
+
+    @staticmethod
+    def read_favorite_means_of_payment_by_user(user_id: str):
+        with SessionLocal() as db:
+            transaction_repository = TransactionRepository(db)
+            transactions = transaction_repository.read_transactions_by_user_id(user_id)
+            means_of_payment = {"cash": 0, "non-cash": 0}
+            for transaction in transactions:
+                if transaction.cash_payment:
+                    means_of_payment["cash"] += 1
+                else:
+                    means_of_payment["non-cash"] += 1
+            return means_of_payment
+
+    @staticmethod
+    def read_inbound_outbound_payments_by_user(user_id: str, transaction_type: str = "outbound"):
+        with SessionLocal() as db:
+            transaction_repository = TransactionRepository(db)
+            transactions = transaction_repository.read_transactions_by_user_id(user_id)
+            inbound_transactions = []
+            inbound_counter = 0
+            outbound_transactions = []
+            outbound_counter = 0
+            for transaction in transactions:
+                if transaction.outbound:
+                    outbound_transactions.append(transaction)
+                    outbound_counter += 1
+                else:
+                    inbound_transactions.append(transaction)
+                    inbound_counter += 1
+            if transaction_type == "outbound":
+                if not outbound_transactions:
+                    raise TransactionNotFoundException(message="No outbound transactions found in the system.",
+                                                       code=404)
+                return outbound_transactions, f"User made {outbound_counter} outbound transactions."
+            elif transaction_type == "inbound":
+                if not inbound_transactions:
+                    raise TransactionNotFoundException(message="No inbound transactions found in the system.",
+                                                       code=404)
+                return inbound_transactions, f"User made {inbound_counter} inbound transactions."
+            else:
+                raise IllegalParameterException(message="Only inbound and outbound available as transaction type.",
+                                                code=401)
