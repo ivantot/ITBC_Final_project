@@ -154,7 +154,7 @@ class BudgetService:
             raise e
 
     @staticmethod
-    def show_budgets_funds_per_category_by_user_id(user_id: str) -> Dict[str, list[Budget]]:
+    def read_budgets_funds_per_category_by_user_id(user_id: str) -> Dict[str, list[Budget]]:
         with SessionLocal() as db:
             budget_repository = BudgetRepository(db)
             budgets = budget_repository.read_budgets_by_user_id(user_id)

@@ -67,6 +67,6 @@ def delete_budget_by_id(budget_id: str):
     return BudgetController.delete_budget_by_id(budget_id)
 
 
-@budget_router.get("/show-budgets-funds-by-user-id", response_model=dict[str, list[BudgetFundsSchema]])
-def show_budgets_funds_per_category_by_user_id(user_id: str):
-    return BudgetController.show_budgets_funds_per_category_by_user_id(user_id)
+@budget_router.get("/get-budgets-funds-by-user-id", response_model=dict[str, list[BudgetFundsSchema]])
+def get_budgets_funds_per_category_by_user_id(user_id: str):
+    return BudgetController.read_budgets_funds_per_category_by_user_id(user_id)

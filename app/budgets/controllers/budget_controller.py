@@ -135,8 +135,8 @@ class BudgetController:
             raise HTTPException(status_code=400, detail=str(e))
 
     @staticmethod
-    def show_budgets_funds_per_category_by_user_id(user_id: str) -> Dict[str, list[Budget]]:
-        budgets = BudgetService.show_budgets_funds_per_category_by_user_id(user_id)
+    def read_budgets_funds_per_category_by_user_id(user_id: str) -> Dict[str, list[Budget]]:
+        budgets = BudgetService.read_budgets_funds_per_category_by_user_id(user_id)
         if budgets:
             return budgets
         else:

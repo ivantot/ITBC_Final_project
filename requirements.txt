@@ -12,3 +12,4 @@ starlette==0.22.0
 PyJWT
 python-decouple==3.7
 bcrypt
+fastapi_mail
