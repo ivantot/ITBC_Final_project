@@ -87,7 +87,7 @@ def delete_budget_by_id(budget_id: str):
 
 
 @budget_router.get("/get-budgets-funds-by-user-id", response_model=dict[str, list[BudgetFundsSchema]],
-                   dependencies=[Depends(JWTBearer("PRO_USER"))])
+                   dependencies=[Depends(JWTBearer("USER"))])
 def get_budgets_funds_per_category_by_user_id(user_id: str):
     """get_budgets_funds_per_category_by_user_id route"""
     return BudgetController.read_budgets_funds_per_category_by_user_id(user_id)
