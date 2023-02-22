@@ -1,3 +1,4 @@
+"""Budgets models module."""
 from uuid import uuid4
 from datetime import datetime
 
@@ -12,6 +13,7 @@ CURRENCIES = settings.CURRENCIES.split(",")
 
 
 class Budget(Base):
+    """Budget class"""
     __tablename__ = "budgets"
     budget_id = Column(String(50), primary_key=True, default=uuid4, autoincrement=False)
     name = Column(String(100))

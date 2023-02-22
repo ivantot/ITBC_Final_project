@@ -1,3 +1,4 @@
+"""Transactions services module."""
 import datetime
 
 from app.budgets.exceptions import BudgetNotFoundException, BudgetNotActiveException, TransactionBudgetTimeException
@@ -22,6 +23,7 @@ CURRENCIES = settings.CURRENCIES.split(",")
 
 
 class TransactionService:
+    """TransactionService class"""
 
     @staticmethod
     def create_transaction(amount: float,
@@ -30,6 +32,7 @@ class TransactionService:
                            outbound: bool = True,
                            currency: str = "DIN",
                            cash_payment: bool = True):
+        """create_transaction function"""
         with SessionLocal() as db:
             try:
                 transaction_repository = TransactionRepository(db)
@@ -82,15 +85,16 @@ class TransactionService:
                 else:
                     money_account_amount = amount
                 if outbound and money_account.balance - money_account_amount < 0:
-                    EmailServices.send_money_account_warning_email(email="ivan.tot@gmail.com",
-                                                                   amount=amount,
+                    EmailServices.send_money_account_warning_email(email=user.email,
+                                                                   amount=round(amount, 2),
+                                                                   vendor_name=vendor.name,
                                                                    transaction_currency=currency,
-                                                                   balance=money_account.balance,
+                                                                   balance=round(money_account.balance, 2),
                                                                    money_account_currency=money_account.currency,
                                                                    user=user.email)
                     raise NotEnoughFundsInMoneyAccountException(message="Not enough funds in money account. "
                                                                         "Check balance.", code=401)
-                if not (relevant_budget.start_date < datetime.datetime.utcnow().date() < relevant_budget.end_date):
+                if not relevant_budget.start_date < datetime.datetime.utcnow().date() < relevant_budget.end_date:
                     raise TransactionBudgetTimeException(message="Transaction is not occurring within budget validity "
                                                                  "period. Check budget start and end date.", code=401)
                 money_account_repository.update_money_account_by_id(money_account_id=money_account.money_account_id,
@@ -114,30 +118,35 @@ class TransactionService:
 
     @staticmethod
     def read_transaction_by_id(transaction_id: str):
+        """read_transaction_by_id function"""
         with SessionLocal() as db:
             transaction_repository = TransactionRepository(db)
             return transaction_repository.read_transaction_by_id(transaction_id)
 
     @staticmethod
     def read_transactions_by_user_id(user_id: str):
+        """read_transactions_by_user_id function"""
         with SessionLocal() as db:
             transaction_repository = TransactionRepository(db)
             return transaction_repository.read_transactions_by_user_id(user_id)
 
     @staticmethod
     def read_transactions_by_vendor_id(vendor_id: str):
+        """read_transactions_by_vendor_id function"""
         with SessionLocal() as db:
             transaction_repository = TransactionRepository(db)
             return transaction_repository.read_transactions_by_vendor_id(vendor_id)
 
     @staticmethod
     def read_all_transactions():
+        """read_all_transactions function"""
         with SessionLocal() as db:
             transaction_repository = TransactionRepository(db)
             return transaction_repository.read_all_transactions()
 
     @staticmethod
     def update_transaction_is_valid(transaction_id: str, is_valid: bool):
+        """update_transaction_is_valid function"""
         with SessionLocal() as db:
             try:
                 transaction_repository = TransactionRepository(db)
@@ -151,6 +160,7 @@ class TransactionService:
 
     @staticmethod
     def delete_transaction_by_id(transaction_id: str):
+        """delete_transaction_by_id function"""
         try:
             with SessionLocal() as db:
                 transaction_repository = TransactionRepository(db)
@@ -164,12 +174,14 @@ class TransactionService:
 
     @staticmethod
     def read_transactions_in_time_by_user_id(user_id: str, start_date: str, end_date: str):
+        """read_transactions_in_time_by_user_id function"""
         with SessionLocal() as db:
             transaction_repository = TransactionRepository(db)
             return transaction_repository.read_transactions_in_time_by_user_id(user_id, start_date, end_date)
 
     @staticmethod
     def read_spending_habits_by_user_id(user_id: str) -> dict[str, str]:
+        """read_spending_habits_by_user_id function"""
         with SessionLocal() as db:
             transaction_repository = TransactionRepository(db)
             transactions = transaction_repository.read_transactions_by_user_id(user_id)
@@ -193,6 +205,7 @@ class TransactionService:
 
     @staticmethod
     def read_number_of_transactions_for_vendors_per_category():
+        """read_number_of_transactions_for_vendors_per_category function"""
         with SessionLocal() as db:
             transaction_repository = TransactionRepository(db)
             category_repository = CategoryRepository(db)
@@ -218,6 +231,7 @@ class TransactionService:
 
     @staticmethod
     def read_favorite_vendors_per_category():
+        """read_favorite_vendors_per_category function"""
         data = TransactionService().read_number_of_transactions_for_vendors_per_category()
         for category in data:
             data[category].sort(key=lambda x: x[1], reverse=True)
@@ -226,6 +240,7 @@ class TransactionService:
 
     @staticmethod
     def read_favorite_means_of_payment_by_user(user_id: str):
+        """read_favorite_means_of_payment_by_user function"""
         with SessionLocal() as db:
             transaction_repository = TransactionRepository(db)
             transactions = transaction_repository.read_transactions_by_user_id(user_id)
@@ -239,6 +254,7 @@ class TransactionService:
 
     @staticmethod
     def read_inbound_outbound_payments_by_user(user_id: str, transaction_type: str = "outbound"):
+        """read_inbound_outbound_payments_by_user function"""
         with SessionLocal() as db:
             transaction_repository = TransactionRepository(db)
             transactions = transaction_repository.read_transactions_by_user_id(user_id)
@@ -258,11 +274,10 @@ class TransactionService:
                     raise TransactionNotFoundException(message="No outbound transactions found in the system.",
                                                        code=404)
                 return outbound_transactions, f"User made {outbound_counter} outbound transactions."
-            elif transaction_type == "inbound":
+            if transaction_type == "inbound":
                 if not inbound_transactions:
                     raise TransactionNotFoundException(message="No inbound transactions found in the system.",
                                                        code=404)
                 return inbound_transactions, f"User made {inbound_counter} inbound transactions."
-            else:
-                raise IllegalParameterException(message="Only inbound and outbound available as transaction type.",
-                                                code=401)
+            raise IllegalParameterException(message="Only inbound and outbound available as transaction type.",
+                                            code=401)

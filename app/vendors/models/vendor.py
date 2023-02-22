@@ -1,3 +1,4 @@
+"""Vendors models module."""
 from uuid import uuid4
 
 from sqlalchemy import Column, String, Boolean, ForeignKey
@@ -7,6 +8,7 @@ from app.db import Base
 
 
 class Vendor(Base):
+    """Vendor class"""
     __tablename__ = "vendors"
     vendor_id = Column(String(50), primary_key=True, default=uuid4, autoincrement=False)
     name = Column(String(100), unique=True)

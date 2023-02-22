@@ -1,4 +1,4 @@
-
+"""Users controllers module."""
 from fastapi import HTTPException, Request
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 
@@ -6,6 +6,8 @@ from app.users.services import decodeJWT
 
 
 class JWTBearer(HTTPBearer):
+    """JWTBearer class"""
+
     def __init__(self, role: str, auto_error: bool = True):
         super(JWTBearer, self).__init__(auto_error=auto_error)
         self.role = role
@@ -24,10 +26,10 @@ class JWTBearer(HTTPBearer):
                     detail="User with provided role is not permitted to access this " "route.",
                 )
             return credentials.credentials
-        else:
-            raise HTTPException(status_code=403, detail="Invalid authorization code.")
+        raise HTTPException(status_code=403, detail="Invalid authorization code.")
 
     def verify_jwt(self, jwt_token: str) -> dict:
+        """verify_jwt function"""
         is_token_valid: bool = False
         try:
             payload = decodeJWT(jwt_token)

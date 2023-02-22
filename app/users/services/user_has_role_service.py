@@ -1,3 +1,4 @@
+"""Users services module."""
 from app.db import SessionLocal
 from app.users.exceptions import UserNotActiveException
 from app.users.exceptions.user_has_role_exceptions import UserHasRoleNotFoundException
@@ -5,9 +6,10 @@ from app.users.reporistories import UserHasRoleRepository, UserRepository
 
 
 class UserHasRoleService:
-
+    """UserHasRoleService class"""
     @staticmethod
     def create_user_has_role(user_id: str, role_id: str):
+        """create_user_has_role function"""
         with SessionLocal() as db:
             try:
                 user_has_role_repository = UserHasRoleRepository(db)
@@ -22,24 +24,28 @@ class UserHasRoleService:
 
     @staticmethod
     def read_user_has_role_by_id(user_has_role_id: str):
+        """read_user_has_role_by_id function"""
         with SessionLocal() as db:
             user_has_role_repository = UserHasRoleRepository(db)
             return user_has_role_repository.read_user_has_role_by_id(user_has_role_id)
 
     @staticmethod
     def read_user_has_roles_by_user_id(user_id: str):
+        """read_user_has_roles_by_user_id function"""
         with SessionLocal() as db:
             user_has_role_repository = UserHasRoleRepository(db)
             return user_has_role_repository.read_user_has_roles_by_user_id(user_id)
 
     @staticmethod
     def read_all_users_have_roles():
+        """read_all_users_have_roles function"""
         with SessionLocal() as db:
             user_has_role_repository = UserHasRoleRepository(db)
             return user_has_role_repository.read_all_users_have_roles()
 
     @staticmethod
     def delete_user_has_role_by_id(user_has_role_id: str):
+        """delete_user_has_role_by_id function"""
         try:
             with SessionLocal() as db:
                 user_has_role_repository = UserHasRoleRepository(db)

@@ -1,3 +1,4 @@
+"""Users services module."""
 import hashlib
 
 from app.db import SessionLocal
@@ -6,9 +7,10 @@ from app.users.reporistories import UserRepository, UserHasRoleRepository, RoleR
 
 
 class UserService:
-
+    """UserService class"""
     @staticmethod
     def create_user(email, password):
+        """create_user function"""
         with SessionLocal() as db:
             try:
                 user_repository = UserRepository(db)
@@ -19,24 +21,28 @@ class UserService:
 
     @staticmethod
     def read_user_by_id(user_id: str):
+        """read_user_by_id function"""
         with SessionLocal() as db:
             user_repository = UserRepository(db)
             return user_repository.read_user_by_id(user_id)
 
     @staticmethod
     def read_all_users():
+        """read_all_users function"""
         with SessionLocal() as db:
             user_repository = UserRepository(db)
             return user_repository.read_all_users()
 
     @staticmethod
     def read_all_active_users():
+        """read_all_active_users function"""
         with SessionLocal() as db:
             user_repository = UserRepository(db)
             return user_repository.read_all_active_users()
 
     @staticmethod
     def read_all_admins():
+        """read_all_admins function"""
         with SessionLocal() as db:
             try:
                 user_repository = UserRepository(db)
@@ -56,6 +62,7 @@ class UserService:
 
     @staticmethod
     def update_user_is_active(user_id: str, is_active: bool):
+        """update_user_is_active function"""
         with SessionLocal() as db:
             try:
                 user_repository = UserRepository(db)
@@ -68,6 +75,7 @@ class UserService:
 
     @staticmethod
     def delete_user_by_id(user_id: str):
+        """delete_user_by_id function"""
         try:
             with SessionLocal() as db:
                 user_repository = UserRepository(db)
@@ -85,6 +93,7 @@ class UserService:
 
     @staticmethod
     def login_user(email: str, password: str):
+        """login_user function"""
         with SessionLocal() as db:
             try:
                 user_repository = UserRepository(db)

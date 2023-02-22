@@ -90,7 +90,11 @@ There must be a vendor, budget and category as well as a user with a money accou
 -    `/api/transactions/get_number_of_transactions_for_vendors_per_category`
 -    `/api/transactions/get_favorite_vendors_per_category`
 -    `/api/transactions/get-favorite-means-of-payment-by-user`
--    `/api/transactions/get-inbound-outbound-payments-by-user`
+-    `/api/transactions/get-inbound-outbound-payments-by-user`  
+  
+
+-    `/api/transactions/add-new-transaction`
+     - bulk of app logic in here, emails sent if transactions puts money account bellow 0
 
 
 

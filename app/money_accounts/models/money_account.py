@@ -1,3 +1,4 @@
+"""Money account models module."""
 from uuid import uuid4
 
 from sqlalchemy import Column, String, Boolean, Float, ForeignKey, CheckConstraint
@@ -11,6 +12,7 @@ CURRENCIES = settings.CURRENCIES.split(",")
 
 
 class MoneyAccount(Base):
+    """MoneyAccount class"""
     __tablename__ = "money_accounts"
     money_account_id = Column(String(50), primary_key=True, default=uuid4, autoincrement=False)
     name = Column(String(100))

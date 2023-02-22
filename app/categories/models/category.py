@@ -1,3 +1,4 @@
+"""Categories models module."""
 from uuid import uuid4
 
 from sqlalchemy import Column, String, Boolean
@@ -6,6 +7,7 @@ from app.db import Base
 
 
 class Category(Base):
+    """Category class"""
     __tablename__ = "categories"
     category_id = Column(String(50), primary_key=True, default=uuid4, autoincrement=False)
     name = Column(String(100), unique=True)

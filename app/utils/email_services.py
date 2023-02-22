@@ -1,10 +1,12 @@
-from fastapi_mail import ConnectionConfig, MessageSchema, MessageType, FastMail
+"""Utils module."""
 import asyncio
+from fastapi_mail import ConnectionConfig, MessageSchema, MessageType, FastMail
 
 from app.config import settings
 
 
 class EmailServices:
+    """EmailServices class"""
     conf = ConnectionConfig(
         MAIL_USERNAME=settings.MAIL_USERNAME,
         MAIL_PASSWORD=settings.MAIL_PASSWORD,
@@ -17,10 +19,11 @@ class EmailServices:
 
     @staticmethod
     def send_money_account_warning_email(email: str, balance: float, amount: float,
-                                         user: str, transaction_currency: str,
+                                         user: str, transaction_currency: str, vendor_name: str,
                                          money_account_currency: str):
+        """send_money_account_warning_email function"""
         html = f"""<p>Dear service user {user} </p>
-        <p>Transaction you're attempting did not succeed, as the transaction amount is <b>{amount}</b>
+        <p>Transaction you're attempting at {vendor_name} did not succeed, as the transaction amount is <b>{amount}</b>
          {transaction_currency} and you have <b>{balance}</b> {money_account_currency} available 
          on your money account.</p><p>Sorry for the inconvenience. Enjoy your day.</p>"""
 
