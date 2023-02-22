@@ -1,3 +1,4 @@
+"""Vendors services module."""
 from app.categories.exceprtions import CategoryNotActiveException, CategoryNotFoundException
 from app.categories.repositories import CategoryRepository
 from app.db import SessionLocal
@@ -6,12 +7,13 @@ from app.vendors.repositories import VendorRepository
 
 
 class VendorService:
-
+    """VendorService class"""
     @staticmethod
     def create_vendor(name: str,
                       address: str,
                       category_id: str,
                       cash_only: bool = False):
+        """create_vendor function"""
         with SessionLocal() as db:
             try:
                 vendor_repository = VendorRepository(db)
@@ -28,30 +30,35 @@ class VendorService:
 
     @staticmethod
     def read_vendor_by_id(vendor_id: str):
+        """read_vendor_by_id function"""
         with SessionLocal() as db:
             vendor_repository = VendorRepository(db)
             return vendor_repository.read_vendor_by_id(vendor_id)
 
     @staticmethod
     def read_vendors_by_category_id(category_id: str):
+        """read_vendors_by_category_id function"""
         with SessionLocal() as db:
             vendor_repository = VendorRepository(db)
             return vendor_repository.read_vendors_by_category_id(category_id)
 
     @staticmethod
     def read_vendor_by_name(name: str):
+        """read_vendor_by_name function"""
         with SessionLocal() as db:
             vendor_repository = VendorRepository(db)
             return vendor_repository.read_vendor_by_name(name)
 
     @staticmethod
     def read_all_vendors():
+        """read_all_vendors function"""
         with SessionLocal() as db:
             vendor_repository = VendorRepository(db)
             return vendor_repository.read_all_vendors()
 
     @staticmethod
     def update_vendor_is_active(vendor_id: str, is_active: bool):
+        """update_vendor_is_active function"""
         with SessionLocal() as db:
             try:
                 vendor_repository = VendorRepository(db)
@@ -65,6 +72,7 @@ class VendorService:
 
     @staticmethod
     def update_vendor_cash_only(vendor_id: str, cash_only: bool):
+        """update_vendor_cash_only function"""
         with SessionLocal() as db:
             try:
                 vendor_repository = VendorRepository(db)
@@ -77,6 +85,7 @@ class VendorService:
 
     @staticmethod
     def update_vendor_by_id(vendor_id: str, name: str = None, address: str = None):
+        """update_vendor_by_id function"""
         with SessionLocal() as db:
             try:
                 vendor_repository = VendorRepository(db)
@@ -90,6 +99,7 @@ class VendorService:
 
     @staticmethod
     def delete_vendor_by_id(vendor_id: str):
+        """delete_vendor_by_id function"""
         try:
             with SessionLocal() as db:
                 vendor_repository = VendorRepository(db)

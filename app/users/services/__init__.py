@@ -1,3 +1,4 @@
+"""Users services module."""
 from .user_service import UserService
 from .role_service import RoleService
 from .user_has_role_service import UserHasRoleService

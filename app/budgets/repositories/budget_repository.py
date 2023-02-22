@@ -1,3 +1,4 @@
+"""Budgets repositories module."""
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
@@ -6,7 +7,7 @@ from app.budgets.models import Budget
 
 
 class BudgetRepository:
-
+    """BudgetRepository class"""
     def __init__(self, db: Session):
         self.db = db
 
@@ -19,6 +20,7 @@ class BudgetRepository:
                       limit: float,
                       currency: str = "DIN",
                       balance: float = 0.0) -> Budget:
+        """create_budget function"""
         try:
             budget = Budget(name,
                             user_id,
@@ -36,26 +38,32 @@ class BudgetRepository:
             raise e
 
     def read_budget_by_id(self, budget_id: str) -> Budget:
+        """read_budget_by_id function"""
         budget = self.db.query(Budget).filter(Budget.budget_id == budget_id).first()
         return budget
 
     def read_budgets_by_user_id(self, user_id: str) -> [Budget]:
+        """read_budgets_by_user_id function"""
         budgets = self.db.query(Budget).filter(Budget.user_id == user_id).all()
         return budgets
 
     def read_budgets_by_category_id(self, category_id: str) -> [Budget]:
+        """read_budgets_by_category_id function"""
         budgets = self.db.query(Budget).filter(Budget.category_id == category_id).all()
         return budgets
 
     def read_all_budgets(self) -> [Budget]:
+        """read_all_budgets function"""
         budgets = self.db.query(Budget).all()
         return budgets
 
     def read_budgets_by_currency(self, currency: str) -> [Budget]:
+        """read_budgets_by_currency function"""
         budgets = self.db.query(Budget).filter(Budget.currency == currency).all()
         return budgets
 
     def update_budget_is_active(self, budget_id: str, is_active: bool) -> Budget:
+        """update_budget_is_active function"""
         try:
             budget = self.db.query(Budget).filter(Budget.budget_id == budget_id).first()
             budget.is_active = is_active
@@ -75,6 +83,7 @@ class BudgetRepository:
                             currency: str = None,
                             balance: float = None,
                             limit: float = None) -> Budget:
+        """update_budget_by_id function"""
         try:
             budget = self.db.query(Budget).filter(Budget.budget_id == budget_id).first()
             if budget is None:
@@ -103,6 +112,7 @@ class BudgetRepository:
             raise e
 
     def delete_budget_by_id(self, budget_id: str) -> bool:
+        """delete_budget_by_id function"""
         try:
             budget = self.db.query(Budget).filter(Budget.money_account_id == budget_id).first()
             self.db.delete(budget)

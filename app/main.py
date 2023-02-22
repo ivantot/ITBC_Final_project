@@ -1,3 +1,4 @@
+"""App module."""
 import uvicorn
 from fastapi import FastAPI
 from starlette.responses import RedirectResponse
@@ -14,6 +15,7 @@ Base.metadata.create_all(bind=engine)
 
 
 def init_app():
+    """init_app docstring"""
     application = FastAPI()
     application.include_router(admin_router)
     application.include_router(user_router)
@@ -33,6 +35,7 @@ app = init_app()
 
 @app.get("/", include_in_schema=False)
 def hello_world():
+    """hello_world docstring"""
     return RedirectResponse('/docs')
 
 

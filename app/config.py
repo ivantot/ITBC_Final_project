@@ -1,7 +1,9 @@
+"""App module."""
 from pydantic import BaseSettings
 
 
 class Settings(BaseSettings):
+    """Settings class."""
     DB_HOST: str
     DB_HOSTNAME: str
     DB_PORT: int
@@ -18,6 +20,7 @@ class Settings(BaseSettings):
     MAIL_FROM: str
 
     class Config:
+        """Config class."""
         env_file = './.env'
 
 

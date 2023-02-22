@@ -1,3 +1,4 @@
+"""Transactions models module."""
 from datetime import datetime
 from uuid import uuid4
 
@@ -12,6 +13,7 @@ CURRENCIES = settings.CURRENCIES.split(",")
 
 
 class Transaction(Base):
+    """Transaction class"""
     __tablename__ = "transactions"
     transaction_id = Column(String(50), primary_key=True, default=uuid4, autoincrement=False)
     outbound = Column(Boolean, default=True)

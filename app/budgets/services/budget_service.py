@@ -1,3 +1,4 @@
+"""Budgets services module."""
 from typing import Dict
 
 from app.budgets.exceptions import BudgetNotFoundException, StartAfterEndDateException, \
@@ -17,7 +18,7 @@ CURRENCIES = settings.CURRENCIES.split(",")
 
 
 class BudgetService:
-
+    """BudgetService class"""
     @staticmethod
     def create_budget(name: str,
                       user_id: str,
@@ -27,6 +28,7 @@ class BudgetService:
                       limit: float,
                       currency: str = "DIN",
                       balance: float = 0.0):
+        """create_budget function"""
         with SessionLocal() as db:
             try:
                 budget_repository = BudgetRepository(db)
@@ -69,36 +71,42 @@ class BudgetService:
 
     @staticmethod
     def read_budget_by_id(budget_id: str):
+        """read_budget_by_id function"""
         with SessionLocal() as db:
             budget_repository = BudgetRepository(db)
             return budget_repository.read_budget_by_id(budget_id)
 
     @staticmethod
     def read_budgets_by_user_id(user_id: str):
+        """read_budgets_by_user_id function"""
         with SessionLocal() as db:
             budget_repository = BudgetRepository(db)
             return budget_repository.read_budgets_by_user_id(user_id)
 
     @staticmethod
     def read_budgets_by_category_id(category_id: str):
+        """read_budgets_by_category_id function"""
         with SessionLocal() as db:
             budget_repository = BudgetRepository(db)
             return budget_repository.read_budgets_by_category_id(category_id)
 
     @staticmethod
     def read_all_budgets():
+        """read_all_budgets function"""
         with SessionLocal() as db:
             budget_repository = BudgetRepository(db)
             return budget_repository.read_all_budgets()
 
     @staticmethod
     def read_budgets_by_currency(currency: str):
+        """read_budgets_by_currency function"""
         with SessionLocal() as db:
             budget_repository = BudgetRepository(db)
             return budget_repository.read_budgets_by_currency(currency)
 
     @staticmethod
     def update_budget_is_active(budget_id: str, is_active: bool):
+        """update_budget_is_active function"""
         with SessionLocal() as db:
             try:
                 budget_repository = BudgetRepository(db)
@@ -120,6 +128,7 @@ class BudgetService:
                             currency: str = None,
                             limit: float = None,
                             balance: float = None):
+        """update_budget_by_id function"""
         with SessionLocal() as db:
             try:
                 budget_repository = BudgetRepository(db)
@@ -142,6 +151,7 @@ class BudgetService:
 
     @staticmethod
     def delete_budget_by_id(budget_id: str):
+        """delete_budget_by_id function"""
         try:
             with SessionLocal() as db:
                 budget_repository = BudgetRepository(db)
@@ -155,6 +165,7 @@ class BudgetService:
 
     @staticmethod
     def read_budgets_funds_per_category_by_user_id(user_id: str) -> Dict[str, list[Budget]]:
+        """read_budgets_funds_per_category_by_user_id function"""
         with SessionLocal() as db:
             budget_repository = BudgetRepository(db)
             budgets = budget_repository.read_budgets_by_user_id(user_id)
