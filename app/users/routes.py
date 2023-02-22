@@ -6,7 +6,8 @@ from app.users.controllers.user_auth_controller import JWTBearer
 from app.users.schemas import RoleSchemaIn, RoleSchema, UserSchema, UserSchemaIn, UserHasRoleSchema, \
     UserHasRoleSchemaIn, UserWithRolesSchema, UserSchemaUpdateIsActive
 
-admin_router = APIRouter(tags=["Admin - run once to add initial admin and roles"], prefix="/api/admin")
+admin_router = APIRouter(tags=["Admin - run once to add initial admin and roles IF DATABASE IS EMPTY"],
+                         prefix="/api/admin")
 user_router = APIRouter(tags=["Users"], prefix="/api/users")
 role_router = APIRouter(tags=["Roles"], prefix="/api/roles")
 user_has_role_router = APIRouter(tags=["User has roles"], prefix="/api/user-has-roles")
@@ -18,7 +19,6 @@ def setup_admin(user: UserSchemaIn):
     admin = UserController.create_user(user.email, user.password)
     admin_role = RoleController.create_role(role_type="ADMIN")
     RoleController.create_role(role_type="USER")
-    RoleController.create_role(role_type="PRO_USER")
     UserHasRoleController.create_user_has_role(user_id=admin.user_id, role_id=admin_role.role_id)
     return admin
 
